@@ -39,6 +39,7 @@ const PolaroidGallery: React.FC<{ images: any[] }> = ({ images }) => {
   const [positions, setPositions] = React.useState<Array<{ x: number; y: number; rotation: number }>>([]);
   const containerRef = useRef<HTMLDivElement>(null);
   const dragRefs = useRef<Array<{ isDragging: boolean; startX: number; startY: number; element: HTMLDivElement | null }>>([]);
+  const positionsRef = useRef<Array<{ x: number; y: number; rotation: number }>>([]);
 
   // Initialize positions scattered around center with random rotation
   useEffect(() => {
@@ -50,8 +51,8 @@ const PolaroidGallery: React.FC<{ images: any[] }> = ({ images }) => {
       // Calculate center of container
       const centerX = containerWidth / 2;
       const centerY = containerHeight / 2;
-      // Scatter radius (about 40% of container size)
-      const scatterRadius = Math.min(containerWidth, containerHeight) * 0.4;
+      // Scatter radius (increased to 60% of container size for more scatter)
+      const scatterRadius = Math.min(containerWidth, containerHeight) * 0.6;
       // Gadget size (30% bigger: 280*1.3=364, 320*1.3=416)
       const gadgetWidth = 416;
       const gadgetHeight = 480;
@@ -77,6 +78,7 @@ const PolaroidGallery: React.FC<{ images: any[] }> = ({ images }) => {
         };
       });
       setPositions(initialPositions);
+      positionsRef.current = initialPositions;
       dragRefs.current = images.map(() => ({
         isDragging: false,
         startX: 0,
@@ -85,16 +87,23 @@ const PolaroidGallery: React.FC<{ images: any[] }> = ({ images }) => {
       }));
     }
   }, [images.length, positions.length]);
+  
+  // Keep positionsRef in sync with positions state
+  useEffect(() => {
+    positionsRef.current = positions;
+  }, [positions]);
 
   const handleStartDrag = (index: number, clientX: number, clientY: number, element: HTMLDivElement) => {
     const containerRect = containerRef.current?.getBoundingClientRect();
     if (!containerRect) return;
     
-    // Calculate offset from the element's bounding rect
-    // This accounts for the element's actual position, including rotation
-    const elementRect = element.getBoundingClientRect();
-    const offsetX = clientX - elementRect.left;
-    const offsetY = clientY - elementRect.top;
+    // Get current position from ref (always up-to-date)
+    const currentPos = positionsRef.current[index] || { x: 0, y: 0, rotation: 0 };
+    
+    // Calculate offset from the click position relative to the element's actual position
+    // Use the element's current position (x, y) from ref, not bounding rect
+    const offsetX = clientX - containerRect.left - currentPos.x;
+    const offsetY = clientY - containerRect.top - currentPos.y;
 
     dragRefs.current[index] = {
       isDragging: true,
@@ -123,6 +132,8 @@ const PolaroidGallery: React.FC<{ images: any[] }> = ({ images }) => {
         if (newPositions[index]) {
           newPositions[index] = { ...newPositions[index], x: constrainedX, y: constrainedY };
         }
+        // Update ref immediately for next drag calculation
+        positionsRef.current = newPositions;
         return newPositions;
       });
     };
@@ -427,13 +438,13 @@ export default function LuxuryAgencyLanding() {
               <div>
                 © {new Date().getFullYear()} Club86. All rights reserved.
               </div>
-              <div>
+              <div className="opacity-5 hover:opacity-20 transition-opacity text-xs">
                 Powered by{' '}
                 <a 
                   href="https://x.com/wenlanbo" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="hover:opacity-80 underline"
+                  className="hover:opacity-100"
                 >
                   @wenlanbo
                 </a>
