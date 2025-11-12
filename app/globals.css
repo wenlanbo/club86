@@ -49,6 +49,45 @@
   }
 }
 
+/* Lemon Milk Font - @font-face declarations */
+/* Add your Lemon Milk font files to app/fonts/ directory or update URLs to use a CDN */
+
+@font-face {
+  font-family: 'Lemon Milk';
+  src: url('./fonts/LemonMilk-Regular.otf') format('opentype'),
+       url('./fonts/LemonMilk-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Lemon Milk';
+  src: url('./fonts/LemonMilk-Medium.otf') format('opentype'),
+       url('./fonts/LemonMilk-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Lemon Milk';
+  src: url('./fonts/LemonMilk-Bold.otf') format('opentype'),
+       url('./fonts/LemonMilk-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Lemon Milk';
+  src: url('./fonts/LemonMilk-Light.otf') format('opentype'),
+       url('./fonts/LemonMilk-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
 @layer base {
   * {
     @apply border-border;
