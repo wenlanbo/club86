@@ -40,22 +40,24 @@ const PolaroidGallery: React.FC<{ images: any[] }> = ({ images }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const dragRefs = useRef<Array<{ isDragging: boolean; startX: number; startY: number; element: HTMLDivElement | null }>>([]);
 
-  // Initialize positions with consistent rotations
+  // Initialize positions randomly scattered like tossed on a table
   useEffect(() => {
     if (positions.length === 0 && containerRef.current) {
       const container = containerRef.current;
       const containerWidth = container.offsetWidth || window.innerWidth;
       const containerHeight = container.offsetHeight || window.innerHeight;
       
-      const initialPositions = images.map((_, index) => {
-        const baseRotation = (index % 3) * 2 - 2; // -2, 0, 2 degrees rotation
-        const cols = Math.min(3, Math.floor(containerWidth / 350));
-        const col = index % cols;
-        const row = Math.floor(index / cols);
+      const initialPositions = images.map(() => {
+        // Random scatter - like photos tossed on a table
+        const randomX = Math.random() * (containerWidth - 320);
+        const randomY = Math.random() * (containerHeight - 400);
+        // Random rotation between -15 and +15 degrees
+        const randomRotation = (Math.random() - 0.5) * 30;
+        
         return {
-          x: Math.max(20, Math.min(50 + col * 350, containerWidth - 320)),
-          y: Math.max(50, Math.min(100 + row * 400, containerHeight - 400)),
-          rotation: baseRotation + (Math.random() - 0.5) * 2, // Small random variation
+          x: Math.max(20, Math.min(randomX, containerWidth - 320)),
+          y: Math.max(50, Math.min(randomY, containerHeight - 400)),
+          rotation: randomRotation,
         };
       });
       setPositions(initialPositions);
@@ -160,7 +162,7 @@ const PolaroidGallery: React.FC<{ images: any[] }> = ({ images }) => {
     <>
       <section 
         id="about" 
-        className="relative min-h-screen bg-background py-20"
+        className="relative min-h-screen bg-black py-20"
         ref={containerRef}
       >
         <div className="relative w-full h-full" style={{ minHeight: '100vh' }}>
@@ -185,7 +187,7 @@ const PolaroidGallery: React.FC<{ images: any[] }> = ({ images }) => {
                 onTouchStart={(e) => handleTouchStart(index, e)}
               >
                 {/* Polaroid frame */}
-                <div className="bg-white p-3 md:p-4 shadow-2xl w-[280px] md:w-[320px]">
+                <div className="bg-white p-3 md:p-4 shadow-2xl w-[280px] md:w-[320px] relative">
                   {/* Image area */}
                   <div className="relative w-full h-[280px] md:h-[320px] bg-gray-100 border border-gray-200">
                     <Image
@@ -197,9 +199,7 @@ const PolaroidGallery: React.FC<{ images: any[] }> = ({ images }) => {
                       priority={true}
                       loading="eager"
                     />
-                  </div>
-                  {/* Polaroid bottom area */}
-                  <div className="h-12 md:h-16 bg-white flex items-center justify-center border-t border-gray-100">
+                    {/* Zoom button at bottom right of photo */}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -208,10 +208,10 @@ const PolaroidGallery: React.FC<{ images: any[] }> = ({ images }) => {
                       }}
                       onMouseDown={(e) => e.stopPropagation()}
                       onTouchStart={(e) => e.stopPropagation()}
-                      className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                      className="absolute bottom-2 right-2 p-2 bg-black/50 hover:bg-black/70 rounded-full transition-colors backdrop-blur-sm z-10"
                       aria-label="Zoom image"
                     >
-                      <ZoomIn className="w-5 h-5 text-gray-600" />
+                      <ZoomIn className="w-5 h-5 text-white" />
                     </button>
                   </div>
                 </div>
