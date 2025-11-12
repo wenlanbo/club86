@@ -211,11 +211,38 @@ export default function LuxuryAgencyLanding() {
 
       {/* FOOTER */}
       <footer className="border-t">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 py-10 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="text-sm text-muted-foreground">© {new Date().getFullYear()} YourAgency. All rights reserved.</div>
-          <div className="flex items-center gap-4 text-sm">
-            <a href="#" className="hover:opacity-80">Privacy</a>
-            <a href="#" className="hover:opacity-80">Terms</a>
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-24">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 mb-12">
+            {/* About Us */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">About Us</h3>
+              <div className="text-sm text-muted-foreground space-y-4">
+                <p>
+                  Club86 is a creative agency building cultural moments for the crypto industry. We specialize in event production, storytelling, and brand strategy for leading projects, exchanges, and communities across web3.
+                </p>
+                <p>
+                  From large-scale conferences and private gatherings to curated brand activations, we connect people, products, and ideas through immersive experiences. Our team blends marketing strategy with cultural insight to help brands stand out, scale authentically, and create lasting impact both online and IRL.
+                </p>
+                <p>
+                  At Club86, we turn crypto into culture, one event, one story, and one connection at a time
+                </p>
+              </div>
+            </div>
+            
+            {/* Contact Us */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
+              <div className="text-sm text-muted-foreground">
+                <a href="mailto:contact@club86.agency" className="hover:opacity-80">contact@club86.agency</a>
+              </div>
+            </div>
+          </div>
+          
+          {/* Copyright */}
+          <div className="border-t pt-8">
+            <div className="text-sm text-muted-foreground">
+              © {new Date().getFullYear()} Club86. All rights reserved.
+            </div>
           </div>
         </div>
       </footer>
