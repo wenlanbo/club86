@@ -40,23 +40,39 @@ const PolaroidGallery: React.FC<{ images: any[] }> = ({ images }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const dragRefs = useRef<Array<{ isDragging: boolean; startX: number; startY: number; element: HTMLDivElement | null }>>([]);
 
-  // Initialize positions randomly scattered like tossed on a table
+  // Initialize positions scattered around center with random rotation
   useEffect(() => {
     if (positions.length === 0 && containerRef.current) {
       const container = containerRef.current;
       const containerWidth = container.offsetWidth || window.innerWidth;
       const containerHeight = container.offsetHeight || window.innerHeight;
       
+      // Calculate center of container
+      const centerX = containerWidth / 2;
+      const centerY = containerHeight / 2;
+      // Scatter radius (about 40% of container size)
+      const scatterRadius = Math.min(containerWidth, containerHeight) * 0.4;
+      // Gadget size (30% bigger: 280*1.3=364, 320*1.3=416)
+      const gadgetWidth = 416;
+      const gadgetHeight = 480;
+      
       const initialPositions = images.map(() => {
-        // Random scatter - like photos tossed on a table
-        const randomX = Math.random() * (containerWidth - 320);
-        const randomY = Math.random() * (containerHeight - 400);
+        // Random angle and distance from center
+        const angle = Math.random() * Math.PI * 2;
+        const distance = Math.random() * scatterRadius;
+        const offsetX = Math.cos(angle) * distance;
+        const offsetY = Math.sin(angle) * distance;
+        
         // Random rotation between -15 and +15 degrees
         const randomRotation = (Math.random() - 0.5) * 30;
         
+        // Calculate position centered around center
+        const x = centerX + offsetX - gadgetWidth / 2;
+        const y = centerY + offsetY - gadgetHeight / 2;
+        
         return {
-          x: Math.max(20, Math.min(randomX, containerWidth - 320)),
-          y: Math.max(50, Math.min(randomY, containerHeight - 400)),
+          x: Math.max(20, Math.min(x, containerWidth - gadgetWidth)),
+          y: Math.max(50, Math.min(y, containerHeight - gadgetHeight)),
           rotation: randomRotation,
         };
       });
@@ -71,27 +87,36 @@ const PolaroidGallery: React.FC<{ images: any[] }> = ({ images }) => {
   }, [images.length, positions.length]);
 
   const handleStartDrag = (index: number, clientX: number, clientY: number, element: HTMLDivElement) => {
-    const rect = element.getBoundingClientRect();
     const containerRect = containerRef.current?.getBoundingClientRect();
-    
     if (!containerRect) return;
+    
+    // Calculate offset from the element's bounding rect
+    // This accounts for the element's actual position, including rotation
+    const elementRect = element.getBoundingClientRect();
+    const offsetX = clientX - elementRect.left;
+    const offsetY = clientY - elementRect.top;
 
     dragRefs.current[index] = {
       isDragging: true,
-      startX: clientX - rect.left,
-      startY: clientY - rect.top,
+      startX: offsetX,
+      startY: offsetY,
       element,
     };
 
     const handleMove = (moveX: number, moveY: number) => {
       if (!dragRefs.current[index].isDragging || !containerRect) return;
       
+      // Calculate new position based on mouse position minus the offset
       const newX = moveX - containerRect.left - dragRefs.current[index].startX;
       const newY = moveY - containerRect.top - dragRefs.current[index].startY;
       
+      // Gadget size (30% bigger)
+      const gadgetWidth = 416;
+      const gadgetHeight = 480;
+      
       // Constrain to container bounds
-      const constrainedX = Math.max(0, Math.min(newX, containerRect.width - 320));
-      const constrainedY = Math.max(0, Math.min(newY, containerRect.height - 400));
+      const constrainedX = Math.max(0, Math.min(newX, containerRect.width - gadgetWidth));
+      const constrainedY = Math.max(0, Math.min(newY, containerRect.height - gadgetHeight));
       
       setPositions(prev => {
         const newPositions = [...prev];
@@ -177,7 +202,7 @@ const PolaroidGallery: React.FC<{ images: any[] }> = ({ images }) => {
                   scale: 1,
                 }}
                 transition={{ delay: index * 0.1, duration: 0.5 }}
-                className="absolute cursor-move touch-none"
+                className="absolute cursor-move touch-none group"
                 style={{
                   left: `${position.x}px`,
                   top: `${position.y}px`,
@@ -186,20 +211,20 @@ const PolaroidGallery: React.FC<{ images: any[] }> = ({ images }) => {
                 onMouseDown={(e) => handleMouseDown(index, e)}
                 onTouchStart={(e) => handleTouchStart(index, e)}
               >
-                {/* Polaroid frame */}
-                <div className="bg-white p-3 md:p-4 shadow-2xl w-[280px] md:w-[320px] relative">
+                {/* Polaroid frame - 30% bigger */}
+                <div className="bg-white p-4 md:p-5 shadow-2xl w-[364px] md:w-[416px] relative">
                   {/* Image area */}
-                  <div className="relative w-full h-[280px] md:h-[320px] bg-gray-100 border border-gray-200">
+                  <div className="relative w-full h-[364px] md:h-[416px] bg-gray-100 border border-gray-200">
                     <Image
                       src={img}
                       alt={`Gallery image ${index + 1}`}
                       fill
                       className="object-cover"
-                      sizes="(max-width: 768px) 280px, 320px"
+                      sizes="(max-width: 768px) 364px, 416px"
                       priority={true}
                       loading="eager"
                     />
-                    {/* Zoom button at bottom right of photo */}
+                    {/* Zoom button at bottom right of photo - only visible on hover */}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -208,7 +233,7 @@ const PolaroidGallery: React.FC<{ images: any[] }> = ({ images }) => {
                       }}
                       onMouseDown={(e) => e.stopPropagation()}
                       onTouchStart={(e) => e.stopPropagation()}
-                      className="absolute bottom-2 right-2 p-2 bg-black/50 hover:bg-black/70 rounded-full transition-colors backdrop-blur-sm z-10"
+                      className="absolute bottom-2 right-2 p-2 bg-black/50 hover:bg-black/70 rounded-full transition-all backdrop-blur-sm z-10 opacity-0 group-hover:opacity-100"
                       aria-label="Zoom image"
                     >
                       <ZoomIn className="w-5 h-5 text-white" />
@@ -398,8 +423,21 @@ export default function LuxuryAgencyLanding() {
           
           {/* Copyright */}
           <div className="border-t pt-8">
-            <div className="text-sm text-muted-foreground">
-              © {new Date().getFullYear()} Club86. All rights reserved.
+            <div className="flex justify-between items-center text-sm text-muted-foreground">
+              <div>
+                © {new Date().getFullYear()} Club86. All rights reserved.
+              </div>
+              <div>
+                Powered by{' '}
+                <a 
+                  href="https://x.com/wenlanbo" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="hover:opacity-80 underline"
+                >
+                  @wenlanbo
+                </a>
+              </div>
             </div>
           </div>
         </div>
