@@ -60,25 +60,36 @@ const HorizontalScrollGallery: React.FC<{ images: any[] }> = ({ images }) => {
 
     const unlockBodyScroll = () => {
       if (!isLocked) return;
+      const currentTop = parseInt(document.body.style.top || '0', 10);
+      const scrollPosition = Math.abs(currentTop) || savedScrollY;
+      
       document.body.style.overflow = '';
       document.body.style.position = '';
       document.body.style.top = '';
       document.body.style.width = '';
-      window.scrollTo(0, savedScrollY);
+      
+      // Use requestAnimationFrame to ensure smooth unlock
+      requestAnimationFrame(() => {
+        window.scrollTo({
+          top: scrollPosition,
+          behavior: 'instant'
+        });
+      });
+      
       isLocked = false;
     };
 
     const updateHorizontalPosition = (progress: number, smooth: boolean = true) => {
       if (!scrollContent) return;
-      progress = Math.max(0, Math.min(1, progress)); // Clamp 0-1
+      progress = Math.max(0, Math.min(1, progress)); // Clamp 0-1 - no infinite scroll
       const totalWidth = scrollContent.scrollWidth;
       const viewportWidth = window.innerWidth;
       const maxScroll = Math.max(0, totalWidth - viewportWidth);
       const translateX = progress * maxScroll;
       
-      // Add smooth transition
+      // Add smoother, longer transition
       if (smooth) {
-        scrollContent.style.transition = 'transform 0.1s ease-out';
+        scrollContent.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
       } else {
         scrollContent.style.transition = 'none';
       }
@@ -116,18 +127,18 @@ const HorizontalScrollGallery: React.FC<{ images: any[] }> = ({ images }) => {
         return; // Allow natural scroll
       }
 
-      // Calculate scroll delta - use fixed sensitivity
-      const scrollSpeed = 0.003; // Adjust for sensitivity (higher = faster)
+      // Calculate scroll delta - use slower, smoother sensitivity
+      const scrollSpeed = 0.001; // Slower scroll (reduced from 0.003)
       const delta = e.deltaY * scrollSpeed;
       
-      // Update scroll progress
+      // Update scroll progress - strictly clamp to 0-1 (no infinite scroll)
       scrollProgress = Math.max(0, Math.min(1, scrollProgress + delta));
       
-      // Check boundaries after update - if hit boundary, unlock
+      // Check boundaries after update - if hit boundary, unlock immediately
       if (scrollProgress <= 0.001 || scrollProgress >= 0.999) {
         unlockBodyScroll();
         // Still update position to show boundary
-        updateHorizontalPosition(scrollProgress);
+        updateHorizontalPosition(scrollProgress, true);
         return;
       }
 
@@ -160,14 +171,19 @@ const HorizontalScrollGallery: React.FC<{ images: any[] }> = ({ images }) => {
           scrollProgress = calculatedProgress;
           updateHorizontalPosition(scrollProgress, false);
           
-          // Lock when pinned (unless at boundary)
+          // Lock when pinned (unless at boundary) - ensure we unlock if at boundary
           if (scrollProgress > 0.001 && scrollProgress < 0.999) {
             lockBodyScroll();
+          } else {
+            // At boundary, make sure we're unlocked
+            if (isLocked) {
+              unlockBodyScroll();
+            }
           }
         }
         // When locked, progress is controlled by wheel events
       } else {
-        // Unlock when not pinned
+        // Unlock when not pinned - always unlock to prevent dead lock
         if (isLocked) {
           unlockBodyScroll();
         }
@@ -230,14 +246,24 @@ const HorizontalScrollGallery: React.FC<{ images: any[] }> = ({ images }) => {
     updateLayout();
     handleScroll(); // Initial call
 
+    // Safety: unlock on visibility change or page unload
+    const handleVisibilityChange = () => {
+      if (document.hidden && isLocked) {
+        unlockBodyScroll();
+      }
+    };
+
     window.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('wheel', handleWheel, { passive: false });
     window.addEventListener('resize', updateLayout);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('wheel', handleWheel);
       window.removeEventListener('resize', updateLayout);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      // Always unlock on cleanup to prevent dead lock
       if (isLocked) {
         unlockBodyScroll();
       }
@@ -267,7 +293,8 @@ const HorizontalScrollGallery: React.FC<{ images: any[] }> = ({ images }) => {
                 fill
                 className="object-cover"
                 sizes="100vw"
-                priority={index < 2}
+                priority={true}
+                loading="eager"
               />
             </div>
           ))}
