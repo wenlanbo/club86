@@ -62,11 +62,19 @@ const HorizontalScrollGallery: React.FC<{ images: any[] }> = ({ images }) => {
 
     const unlockScroll = () => {
       if (!isLocked) return;
+      // Get the current scroll position from the fixed body offset
+      const currentTop = parseInt(document.body.style.top || '0', 10);
+      const savedScrollPosition = Math.abs(currentTop) || scrollPosition;
+      
+      // Restore body styles
       document.body.style.overflow = '';
       document.body.style.position = '';
       document.body.style.top = '';
       document.body.style.width = '';
-      window.scrollTo(0, scrollPosition);
+      
+      // Restore scroll position immediately without animation to prevent glitch
+      window.scrollTo(0, savedScrollPosition);
+      
       isLocked = false;
       virtualScroll = 0;
     };
@@ -80,8 +88,9 @@ const HorizontalScrollGallery: React.FC<{ images: any[] }> = ({ images }) => {
       // Set container height to allow scrolling through all images
       // The height determines how much vertical scroll is needed to go through all images horizontally
       // This creates the "locked" effect - scroll down to scroll images horizontally
-      // Use a smaller multiplier to reduce white space, with a minimum to ensure it works on small screens
-      const containerHeight = Math.max(maxHorizontalScroll * 1.1, viewportWidth * 0.5);
+      // Use minimal height - just enough to scroll through all images with minimal white space
+      // Only add a small buffer to ensure smooth scrolling
+      const containerHeight = Math.max(maxHorizontalScroll * 0.95, viewportWidth * 0.2);
       container.style.height = `${containerHeight}px`;
       maxVirtualScroll = containerHeight;
     };
@@ -162,36 +171,37 @@ const HorizontalScrollGallery: React.FC<{ images: any[] }> = ({ images }) => {
         const scrollingUp = e.deltaY < 0;
         const scrollingDown = e.deltaY > 0;
         
-        // If at start and trying to scroll up, unlock immediately and allow scroll
+        // If at start and trying to scroll up, unlock and allow natural scroll
         if (isAtStart && scrollingUp) {
           unlockScroll();
-          // Don't prevent default - allow natural scroll
+          // Don't prevent default - let natural scroll happen
           return;
         }
         
-        // If at end and trying to scroll down, unlock immediately and allow scroll
+        // If at end and trying to scroll down, unlock and allow natural scroll
         if (isAtEnd && scrollingDown) {
           unlockScroll();
-          // Don't prevent default - allow natural scroll
+          // Don't prevent default - let natural scroll happen
           return;
         }
         
         // Check if we'll hit a boundary after this scroll
         const nextVirtualScroll = virtualScroll + e.deltaY;
-        const nextProgress = maxVirtualScroll > 0 ? Math.max(0, Math.min(nextVirtualScroll, maxVirtualScroll)) / maxVirtualScroll : 0;
+        const clampedNextScroll = Math.max(0, Math.min(nextVirtualScroll, maxVirtualScroll));
+        const nextProgress = maxVirtualScroll > 0 ? clampedNextScroll / maxVirtualScroll : 0;
         const willHitStart = nextProgress <= 0.001 && scrollingUp;
         const willHitEnd = nextProgress >= 0.999 && scrollingDown;
         
         // If we'll hit a boundary, unlock and allow natural scroll
         if (willHitStart || willHitEnd) {
           unlockScroll();
+          // Don't prevent default - let natural scroll happen
           return;
         }
         
         // Otherwise, prevent default and update horizontal scroll
         e.preventDefault();
-        virtualScroll = nextVirtualScroll;
-        virtualScroll = Math.max(0, Math.min(virtualScroll, maxVirtualScroll));
+        virtualScroll = clampedNextScroll;
         
         // Calculate progress based on virtual scroll
         const progress = maxVirtualScroll > 0 ? virtualScroll / maxVirtualScroll : 0;
