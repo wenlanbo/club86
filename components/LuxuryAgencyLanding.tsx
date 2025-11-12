@@ -62,18 +62,27 @@ const HorizontalScrollGallery: React.FC<{ images: any[] }> = ({ images }) => {
 
     const unlockScroll = () => {
       if (!isLocked) return;
+      
       // Get the current scroll position from the fixed body offset
       const currentTop = parseInt(document.body.style.top || '0', 10);
       const savedScrollPosition = Math.abs(currentTop) || scrollPosition;
       
-      // Restore body styles
+      // Restore body styles first
       document.body.style.overflow = '';
       document.body.style.position = '';
       document.body.style.top = '';
       document.body.style.width = '';
       
-      // Restore scroll position immediately without animation to prevent glitch
-      window.scrollTo(0, savedScrollPosition);
+      // Use double requestAnimationFrame to ensure smooth transition and prevent header shake
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          // Restore scroll position smoothly
+          window.scrollTo({
+            top: savedScrollPosition,
+            behavior: 'instant'
+          });
+        });
+      });
       
       isLocked = false;
       virtualScroll = 0;
@@ -83,14 +92,17 @@ const HorizontalScrollGallery: React.FC<{ images: any[] }> = ({ images }) => {
       // Calculate the total width needed to scroll through all images
       const totalWidth = scrollContent.scrollWidth;
       const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
       const maxHorizontalScroll = Math.max(0, totalWidth - viewportWidth);
       
-      // Set container height to allow scrolling through all images
-      // The height determines how much vertical scroll is needed to go through all images horizontally
-      // This creates the "locked" effect - scroll down to scroll images horizontally
-      // Use minimal height - just enough to scroll through all images with minimal white space
-      // Only add a small buffer to ensure smooth scrolling
-      const containerHeight = Math.max(maxHorizontalScroll * 0.95, viewportWidth * 0.2);
+      // Set container height to match the image height (85vh mobile, 90vh desktop)
+      // This makes the section height the same as the images height
+      const isMobile = viewportWidth < 768;
+      const imageHeight = isMobile ? viewportHeight * 0.85 : viewportHeight * 0.90;
+      
+      // Calculate how much vertical scroll is needed to scroll through all images horizontally
+      // The container height should be enough to allow scrolling through all images
+      const containerHeight = Math.max(maxHorizontalScroll * 0.95, imageHeight);
       container.style.height = `${containerHeight}px`;
       maxVirtualScroll = containerHeight;
     };
@@ -160,6 +172,16 @@ const HorizontalScrollGallery: React.FC<{ images: any[] }> = ({ images }) => {
       
       const rect = container.getBoundingClientRect();
       const isPinned = rect.top <= 0 && rect.bottom > 0;
+      const isVisible = rect.bottom > 0 && rect.top < window.innerHeight;
+
+      // Only process wheel events when the section is actually visible and pinned
+      if (!isVisible || !isPinned) {
+        // If section is not visible, make sure it's unlocked
+        if (isLocked) {
+          unlockScroll();
+        }
+        return;
+      }
 
       if (isPinned && isLocked) {
         // Calculate current progress before updating
