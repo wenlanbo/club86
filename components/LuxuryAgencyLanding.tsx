@@ -45,6 +45,32 @@ const HorizontalScrollGallery: React.FC<{ images: any[] }> = ({ images }) => {
     
     if (!container || !scrollContent) return;
 
+    let isLocked = false;
+    let scrollPosition = 0;
+    let virtualScroll = 0;
+    let maxVirtualScroll = 0;
+
+    const lockScroll = () => {
+      if (isLocked) return;
+      scrollPosition = window.scrollY;
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollPosition}px`;
+      document.body.style.width = '100%';
+      isLocked = true;
+    };
+
+    const unlockScroll = () => {
+      if (!isLocked) return;
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      window.scrollTo(0, scrollPosition);
+      isLocked = false;
+      virtualScroll = 0;
+    };
+
     const updateLayout = () => {
       // Calculate the total width needed to scroll through all images
       const totalWidth = scrollContent.scrollWidth;
@@ -57,6 +83,7 @@ const HorizontalScrollGallery: React.FC<{ images: any[] }> = ({ images }) => {
       // Make sure the height is sufficient to scroll through all images
       const containerHeight = Math.max(maxHorizontalScroll * 1.2, viewportWidth * 2);
       container.style.height = `${containerHeight}px`;
+      maxVirtualScroll = containerHeight;
     };
 
     // Wait for images to load
@@ -97,52 +124,70 @@ const HorizontalScrollGallery: React.FC<{ images: any[] }> = ({ images }) => {
 
     window.addEventListener('resize', handleResize);
 
-      const handleScroll = () => {
+    const updateHorizontalPosition = (progress: number) => {
+      if (!scrollContent) return;
+      const totalWidth = scrollContent.scrollWidth;
+      const viewportWidth = window.innerWidth;
+      const maxScroll = Math.max(0, totalWidth - viewportWidth);
+      const horizontalPosition = progress * maxScroll;
+      scrollContent.style.transform = `translateX(-${horizontalPosition}px)`;
+    };
+
+    const handleWheel = (e: WheelEvent) => {
+      if (!container || !scrollContent) return;
+      
+      const rect = container.getBoundingClientRect();
+      const isPinned = rect.top <= 0 && rect.bottom > 0;
+
+      if (isPinned) {
+        // Lock scroll if not already locked
+        if (!isLocked) {
+          lockScroll();
+          virtualScroll = 0;
+        }
+        
+        e.preventDefault();
+        virtualScroll += e.deltaY;
+        virtualScroll = Math.max(0, Math.min(virtualScroll, maxVirtualScroll));
+        
+        // Calculate progress based on virtual scroll
+        const progress = maxVirtualScroll > 0 ? virtualScroll / maxVirtualScroll : 0;
+        updateHorizontalPosition(progress);
+      }
+    };
+
+    const handleScroll = () => {
       if (!container || !scrollContent) return;
 
       const rect = container.getBoundingClientRect();
       const containerTop = rect.top;
       const containerBottom = rect.bottom;
-      const scrollY = window.scrollY;
       const containerHeight = container.offsetHeight;
-      const containerOffsetTop = container.offsetTop;
 
       // Check if we're in the pinned section (sticky at top)
       const isPinned = containerTop <= 0 && containerBottom > 0;
 
       if (isPinned) {
-        // Track when sticky starts - record container bottom position
-        if (stickyStartY.current === null) {
-          stickyStartY.current = containerBottom;
+        // Lock vertical scroll when section is pinned
+        if (!isLocked) {
+          lockScroll();
+          virtualScroll = 0; // Reset virtual scroll when entering pinned state
+        }
+      } else {
+        // Unlock vertical scroll when section is not pinned
+        if (isLocked) {
+          unlockScroll();
         }
 
-        // Calculate progress based on how much of the container has scrolled past
-        // When sticky starts, containerBottom is at its maximum (containerHeight)
-        // As we scroll, containerBottom decreases to 0
-        // Progress = 1 - (containerBottom / initialContainerBottom)
-        const initialBottom = stickyStartY.current || containerHeight;
-        const progress = Math.min(1, Math.max(0, 1 - (containerBottom / initialBottom)));
-
-        // Calculate horizontal scroll position
-        const totalWidth = scrollContent.scrollWidth;
-        const viewportWidth = window.innerWidth;
-        const maxScroll = Math.max(0, totalWidth - viewportWidth);
-        const horizontalPosition = progress * maxScroll;
-
-        scrollContent.style.transform = `translateX(-${horizontalPosition}px)`;
-      } else {
         // Reset when not pinned
         stickyStartY.current = null;
         
         if (containerTop > 0) {
           // Before section - show first image
-          scrollContent.style.transform = 'translateX(0)';
+          updateHorizontalPosition(0);
         } else if (containerBottom <= 0) {
           // After section - show last image
-          const totalWidth = scrollContent.scrollWidth;
-          const viewportWidth = window.innerWidth;
-          const maxScroll = Math.max(0, totalWidth - viewportWidth);
-          scrollContent.style.transform = `translateX(-${maxScroll}px)`;
+          updateHorizontalPosition(1);
         }
       }
     };
@@ -158,11 +203,16 @@ const HorizontalScrollGallery: React.FC<{ images: any[] }> = ({ images }) => {
     };
 
     window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('wheel', handleWheel, { passive: false });
     handleScroll(); // Initial call
 
     return () => {
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', handleResize);
+      window.removeEventListener('wheel', handleWheel);
+      if (isLocked) {
+        unlockScroll();
+      }
       if (rafId !== null) {
         cancelAnimationFrame(rafId);
       }
