@@ -37,6 +37,7 @@ const Capability: React.FC<{title: string; items: string[]}> = ({ title, items }
 const PolaroidGallery: React.FC<{ images: any[] }> = ({ images }) => {
   const [zoomedImage, setZoomedImage] = React.useState<number | null>(null);
   const [positions, setPositions] = React.useState<Array<{ x: number; y: number; rotation: number }>>([]);
+  const [draggedIndex, setDraggedIndex] = React.useState<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const dragRefs = useRef<Array<{ isDragging: boolean; startX: number; startY: number; element: HTMLDivElement | null }>>([]);
   const positionsRef = useRef<Array<{ x: number; y: number; rotation: number }>>([]);
@@ -111,6 +112,9 @@ const PolaroidGallery: React.FC<{ images: any[] }> = ({ images }) => {
       startY: offsetY,
       element,
     };
+    
+    // Set this photo as the top layer
+    setDraggedIndex(index);
 
     const handleMove = (moveX: number, moveY: number) => {
       if (!dragRefs.current[index].isDragging || !containerRect) return;
@@ -147,6 +151,7 @@ const PolaroidGallery: React.FC<{ images: any[] }> = ({ images }) => {
 
     const handleEnd = () => {
       dragRefs.current[index].isDragging = false;
+      setDraggedIndex(null); // Clear top layer when dragging ends
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleEnd);
       document.removeEventListener('touchmove', handleTouchMove);
@@ -218,6 +223,7 @@ const PolaroidGallery: React.FC<{ images: any[] }> = ({ images }) => {
                   left: `${position.x}px`,
                   top: `${position.y}px`,
                   transform: `rotate(${position.rotation}deg)`,
+                  zIndex: draggedIndex === index ? 50 : 10 + index,
                 }}
                 onMouseDown={(e) => handleMouseDown(index, e)}
                 onTouchStart={(e) => handleTouchStart(index, e)}
