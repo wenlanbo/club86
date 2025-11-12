@@ -201,60 +201,13 @@ export default function LuxuryAgencyLanding() {
 
       {/* CONTACT */}
       <section id="contact" className="border-t">
-        <div className="max-w-5xl mx-auto px-4 md:px-6 py-16 md:py-24">
-          <SectionTitle overline="Contact" title="Let&apos;s build something exceptional" subtitle="Share a few details and we&apos;ll get back quickly."/>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="md:col-span-2 rounded-2xl">
-              <CardContent className="p-6 md:p-8">
-                <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Input placeholder="Your name"/>
-                  <Input placeholder="Email" type="email"/>
-                  <Input placeholder="Company"/>
-                  <Input placeholder="Budget (optional)"/>
-                  <Textarea placeholder="Tell us about the project" className="md:col-span-2 min-h-[120px]"/>
-                  <div className="md:col-span-2 flex items-center justify-between mt-2">
-                    <div className="text-xs text-muted-foreground">By submitting, you agree to our terms.</div>
-                    <Button type="button" className="rounded-full">Send inquiry <ArrowRight className="ml-2 h-4 w-4"/></Button>
-                  </div>
-                </form>
-              </CardContent>
-            </Card>
-            <div className="space-y-4">
-              <Card className="rounded-2xl">
-                <CardContent className="p-6">
-                  <div className="flex items-start gap-3">
-                    <Mail className="h-5 w-5 mt-1"/>
-                    <div>
-                      <div className="font-medium">Email</div>
-                      <a className="text-sm text-muted-foreground" href="mailto:hello@yoursite.com">hello@yoursite.com</a>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card className="rounded-2xl">
-                <CardContent className="p-6">
-                  <div className="flex items-start gap-3">
-                    <Phone className="h-5 w-5 mt-1"/>
-                    <div>
-                      <div className="font-medium">Phone</div>
-                      <p className="text-sm text-muted-foreground">+1 (212) 555‑0199</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card className="rounded-2xl">
-                <CardContent className="p-6">
-                  <div className="flex items-start gap-3">
-                    <MapPin className="h-5 w-5 mt-1"/>
-                    <div>
-                      <div className="font-medium">Studio</div>
-                      <p className="text-sm text-muted-foreground">New York, NY</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
+        <div className="max-w-5xl mx-auto px-4 md:px-6 py-16 md:py-24 text-center">
+          <h2 className="text-3xl md:text-5xl font-semibold leading-tight mb-8">
+            Let&apos;s create moments that leave a mark
+          </h2>
+          <Button asChild size="lg" className="rounded-full">
+            <a href="mailto:contact@club86.agency">Let&apos;s Talk <ArrowRight className="ml-2 h-5 w-5"/></a>
+          </Button>
         </div>
       </section>
 
