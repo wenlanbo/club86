@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { Sparkles, CheckCircle } from "lucide-react";
+import { Sparkles, CheckCircle, ZoomIn, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
@@ -33,274 +33,234 @@ const Capability: React.FC<{title: string; items: string[]}> = ({ title, items }
   </Card>
 );
 
-// Horizontal scrolling gallery component with scroll locking
-const HorizontalScrollGallery: React.FC<{ images: any[] }> = ({ images }) => {
+// Polaroid-style gallery component with draggable gadgets and zoom
+const PolaroidGallery: React.FC<{ images: any[] }> = ({ images }) => {
+  const [zoomedImage, setZoomedImage] = React.useState<number | null>(null);
+  const [positions, setPositions] = React.useState<Array<{ x: number; y: number; rotation: number }>>([]);
   const containerRef = useRef<HTMLDivElement>(null);
-  const scrollContentRef = useRef<HTMLDivElement>(null);
+  const dragRefs = useRef<Array<{ isDragging: boolean; startX: number; startY: number; element: HTMLDivElement | null }>>([]);
 
+  // Initialize positions with consistent rotations
   useEffect(() => {
-    const container = containerRef.current;
-    const scrollContent = scrollContentRef.current;
-    
-    if (!container || !scrollContent) return;
-
-    let isLocked = false;
-    let savedScrollY = 0;
-    let scrollProgress = 0; // 0 to 1
-
-    const lockBodyScroll = () => {
-      if (isLocked) return;
-      savedScrollY = window.scrollY;
-      document.body.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.top = `-${savedScrollY}px`;
-      document.body.style.width = '100%';
-      isLocked = true;
-    };
-
-    const unlockBodyScroll = () => {
-      if (!isLocked) return;
-      const currentTop = parseInt(document.body.style.top || '0', 10);
-      const scrollPosition = Math.abs(currentTop) || savedScrollY;
+    if (positions.length === 0 && containerRef.current) {
+      const container = containerRef.current;
+      const containerWidth = container.offsetWidth || window.innerWidth;
+      const containerHeight = container.offsetHeight || window.innerHeight;
       
-      document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.width = '';
-      
-      // Use requestAnimationFrame to ensure smooth unlock
-      requestAnimationFrame(() => {
-        window.scrollTo({
-          top: scrollPosition,
-          behavior: 'instant'
-        });
+      const initialPositions = images.map((_, index) => {
+        const baseRotation = (index % 3) * 2 - 2; // -2, 0, 2 degrees rotation
+        const cols = Math.min(3, Math.floor(containerWidth / 350));
+        const col = index % cols;
+        const row = Math.floor(index / cols);
+        return {
+          x: Math.max(20, Math.min(50 + col * 350, containerWidth - 320)),
+          y: Math.max(50, Math.min(100 + row * 400, containerHeight - 400)),
+          rotation: baseRotation + (Math.random() - 0.5) * 2, // Small random variation
+        };
       });
-      
-      isLocked = false;
-    };
-
-    const updateHorizontalPosition = (progress: number, smooth: boolean = true) => {
-      if (!scrollContent) return;
-      progress = Math.max(0, Math.min(1, progress)); // Clamp 0-1 - no infinite scroll
-      const totalWidth = scrollContent.scrollWidth;
-      const viewportWidth = window.innerWidth;
-      const maxScroll = Math.max(0, totalWidth - viewportWidth);
-      const translateX = progress * maxScroll;
-      
-      // Add smoother, longer transition
-      if (smooth) {
-        scrollContent.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-      } else {
-        scrollContent.style.transition = 'none';
-      }
-      
-      scrollContent.style.transform = `translateX(-${translateX}px)`;
-    };
-
-    const handleWheel = (e: WheelEvent) => {
-      if (!container || !scrollContent) return;
-      
-      const rect = container.getBoundingClientRect();
-      const headerHeight = 60; // Match the top-[60px] value
-      const isPinned = rect.top <= headerHeight && rect.bottom > headerHeight;
-      
-      // Only handle when pinned and visible
-      if (!isPinned) {
-        if (isLocked) unlockBodyScroll();
-        return;
-      }
-
-      // Lock body scroll if not already locked
-      if (!isLocked) {
-        lockBodyScroll();
-      }
-
-      // Check if at boundaries BEFORE updating
-      const isAtStart = scrollProgress <= 0.001;
-      const isAtEnd = scrollProgress >= 0.999;
-      const scrollingUp = e.deltaY < 0;
-      const scrollingDown = e.deltaY > 0;
-
-      // If at boundary and trying to scroll past it, unlock immediately
-      if ((isAtStart && scrollingUp) || (isAtEnd && scrollingDown)) {
-        unlockBodyScroll();
-        return; // Allow natural scroll
-      }
-
-      // Calculate scroll delta - use slower, smoother sensitivity
-      const scrollSpeed = 0.001; // Slower scroll (reduced from 0.003)
-      const delta = e.deltaY * scrollSpeed;
-      
-      // Update scroll progress - strictly clamp to 0-1 (no infinite scroll)
-      scrollProgress = Math.max(0, Math.min(1, scrollProgress + delta));
-      
-      // Check boundaries after update - if hit boundary, unlock immediately
-      if (scrollProgress <= 0.001 || scrollProgress >= 0.999) {
-        unlockBodyScroll();
-        // Still update position to show boundary
-        updateHorizontalPosition(scrollProgress, true);
-        return;
-      }
-
-      // Prevent default and update position
-      e.preventDefault();
-      updateHorizontalPosition(scrollProgress);
-    };
-
-    const handleScroll = () => {
-      if (!container || !scrollContent) return;
-
-      const rect = container.getBoundingClientRect();
-      const headerHeight = 60; // Match the top-[60px] value
-      const isPinned = rect.top <= headerHeight && rect.bottom > headerHeight;
-
-      if (isPinned) {
-        // Calculate progress based on how much we've scrolled through the container
-        const containerTop = container.offsetTop;
-        const containerHeight = container.offsetHeight;
-        const scrollY = window.scrollY;
-        
-        // Calculate how far we've scrolled into the container
-        // When container top reaches headerHeight, we start at progress 0
-        // When container bottom reaches headerHeight, we end at progress 1
-        const scrollIntoContainer = scrollY - (containerTop - headerHeight);
-        const calculatedProgress = Math.max(0, Math.min(1, scrollIntoContainer / containerHeight));
-        
-        // Update progress when entering pinned state
-        if (!isLocked) {
-          scrollProgress = calculatedProgress;
-          updateHorizontalPosition(scrollProgress, false);
-          
-          // Lock when pinned (unless at boundary) - ensure we unlock if at boundary
-          if (scrollProgress > 0.001 && scrollProgress < 0.999) {
-            lockBodyScroll();
-          } else {
-            // At boundary, make sure we're unlocked
-            if (isLocked) {
-              unlockBodyScroll();
-            }
-          }
-        }
-        // When locked, progress is controlled by wheel events
-      } else {
-        // Unlock when not pinned - always unlock to prevent dead lock
-        if (isLocked) {
-          unlockBodyScroll();
-        }
-        // Set initial position
-        if (rect.top > headerHeight) {
-          // Before section - show first image
-          scrollProgress = 0;
-          updateHorizontalPosition(0, false);
-        } else if (rect.bottom <= headerHeight) {
-          // After section - show last image
-          scrollProgress = 1;
-          updateHorizontalPosition(1, false);
-        }
-      }
-    };
-
-    // Set container height to allow scrolling through all images
-    const updateLayout = () => {
-      if (!container || !scrollContent) return;
-      const viewportHeight = window.innerHeight;
-      const isMobile = window.innerWidth < 768;
-      const imageHeight = isMobile ? viewportHeight * 0.85 : viewportHeight * 0.90;
-      
-      // Calculate total horizontal scroll distance
-      const totalWidth = scrollContent.scrollWidth;
-      const viewportWidth = window.innerWidth;
-      const maxHorizontalScroll = Math.max(0, totalWidth - viewportWidth);
-      
-      // Container height should be at least image height, but also enough to scroll through all images
-      // This allows vertical scroll to map to horizontal image scrolling
-      const containerHeight = Math.max(imageHeight, maxHorizontalScroll);
-      container.style.height = `${containerHeight}px`;
-    };
-
-    // Wait for images to load
-    const imagesElements = scrollContent.querySelectorAll('img');
-    let loadedCount = 0;
-    const totalImages = imagesElements.length;
-
-    if (totalImages === 0) {
-      updateLayout();
-    } else {
-      const checkAllLoaded = () => {
-        loadedCount++;
-        if (loadedCount === totalImages) {
-          updateLayout();
-        }
-      };
-
-      imagesElements.forEach((img: HTMLImageElement) => {
-        if (img.complete) {
-          checkAllLoaded();
-        } else {
-          img.addEventListener('load', checkAllLoaded);
-          img.addEventListener('error', checkAllLoaded);
-        }
-      });
+      setPositions(initialPositions);
+      dragRefs.current = images.map(() => ({
+        isDragging: false,
+        startX: 0,
+        startY: 0,
+        element: null,
+      }));
     }
+  }, [images.length, positions.length]);
 
-    updateLayout();
-    handleScroll(); // Initial call
+  const handleStartDrag = (index: number, clientX: number, clientY: number, element: HTMLDivElement) => {
+    const rect = element.getBoundingClientRect();
+    const containerRect = containerRef.current?.getBoundingClientRect();
+    
+    if (!containerRect) return;
 
-    // Safety: unlock on visibility change or page unload
-    const handleVisibilityChange = () => {
-      if (document.hidden && isLocked) {
-        unlockBodyScroll();
+    dragRefs.current[index] = {
+      isDragging: true,
+      startX: clientX - rect.left,
+      startY: clientY - rect.top,
+      element,
+    };
+
+    const handleMove = (moveX: number, moveY: number) => {
+      if (!dragRefs.current[index].isDragging || !containerRect) return;
+      
+      const newX = moveX - containerRect.left - dragRefs.current[index].startX;
+      const newY = moveY - containerRect.top - dragRefs.current[index].startY;
+      
+      // Constrain to container bounds
+      const constrainedX = Math.max(0, Math.min(newX, containerRect.width - 320));
+      const constrainedY = Math.max(0, Math.min(newY, containerRect.height - 400));
+      
+      setPositions(prev => {
+        const newPositions = [...prev];
+        if (newPositions[index]) {
+          newPositions[index] = { ...newPositions[index], x: constrainedX, y: constrainedY };
+        }
+        return newPositions;
+      });
+    };
+
+    const handleMouseMove = (e: MouseEvent) => handleMove(e.clientX, e.clientY);
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        handleMove(e.touches[0].clientX, e.touches[0].clientY);
       }
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    window.addEventListener('wheel', handleWheel, { passive: false });
-    window.addEventListener('resize', updateLayout);
-    document.addEventListener('visibilitychange', handleVisibilityChange);
+    const handleEnd = () => {
+      dragRefs.current[index].isDragging = false;
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleEnd);
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleEnd);
+    };
 
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('wheel', handleWheel);
-      window.removeEventListener('resize', updateLayout);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      // Always unlock on cleanup to prevent dead lock
-      if (isLocked) {
-        unlockBodyScroll();
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleEnd);
+    document.addEventListener('touchmove', handleTouchMove, { passive: false });
+    document.addEventListener('touchend', handleEnd);
+  };
+
+  const handleMouseDown = (index: number, e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    handleStartDrag(index, e.clientX, e.clientY, e.currentTarget);
+  };
+
+  const handleTouchStart = (index: number, e: React.TouchEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    if (e.touches.length > 0) {
+      handleStartDrag(index, e.touches[0].clientX, e.touches[0].clientY, e.currentTarget);
+    }
+  };
+
+  const handleZoom = (index: number) => {
+    setZoomedImage(index);
+    document.body.style.overflow = 'hidden';
+  };
+
+  const handleCloseZoom = () => {
+    setZoomedImage(null);
+    document.body.style.overflow = '';
+  };
+
+  // Handle ESC key to close zoom
+  useEffect(() => {
+    if (zoomedImage === null) return;
+    
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        handleCloseZoom();
       }
     };
-  }, [images.length]);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [zoomedImage]);
 
   return (
-    <section 
-      id="about" 
-      className="overflow-hidden relative"
-      ref={containerRef}
-    >
-      <div className="sticky top-[60px] h-[calc(100vh-60px)] flex items-center overflow-hidden bg-background z-30">
-        <div 
-          className="flex will-change-transform"
-          ref={scrollContentRef}
-          style={{ width: 'max-content' }}
+    <>
+      <section 
+        id="about" 
+        className="relative min-h-screen bg-background py-20"
+        ref={containerRef}
+      >
+        <div className="relative w-full h-full" style={{ minHeight: '100vh' }}>
+          {images.map((img, index) => {
+            const position = positions[index] || { x: 0, y: 0, rotation: 0 };
+            return (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ 
+                  opacity: 1, 
+                  scale: 1,
+                }}
+                transition={{ delay: index * 0.1, duration: 0.5 }}
+                className="absolute cursor-move touch-none"
+                style={{
+                  left: `${position.x}px`,
+                  top: `${position.y}px`,
+                  transform: `rotate(${position.rotation}deg)`,
+                }}
+                onMouseDown={(e) => handleMouseDown(index, e)}
+                onTouchStart={(e) => handleTouchStart(index, e)}
+              >
+                {/* Polaroid frame */}
+                <div className="bg-white p-3 md:p-4 shadow-2xl w-[280px] md:w-[320px]">
+                  {/* Image area */}
+                  <div className="relative w-full h-[280px] md:h-[320px] bg-gray-100 border border-gray-200">
+                    <Image
+                      src={img}
+                      alt={`Gallery image ${index + 1}`}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 280px, 320px"
+                      priority={true}
+                      loading="eager"
+                    />
+                  </div>
+                  {/* Polaroid bottom area */}
+                  <div className="h-12 md:h-16 bg-white flex items-center justify-center border-t border-gray-100">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        handleZoom(index);
+                      }}
+                      onMouseDown={(e) => e.stopPropagation()}
+                      onTouchStart={(e) => e.stopPropagation()}
+                      className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                      aria-label="Zoom image"
+                    >
+                      <ZoomIn className="w-5 h-5 text-gray-600" />
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Full-screen zoom modal */}
+      {zoomedImage !== null && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center cursor-pointer"
+          onClick={handleCloseZoom}
         >
-          {images.map((img, index) => (
-            <div 
-              key={index} 
-              className="relative w-screen h-[85vh] md:h-[90vh] flex-shrink-0"
+          <div className="relative w-full h-full flex items-center justify-center p-4">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleCloseZoom();
+              }}
+              className="absolute top-4 right-4 z-10 p-3 bg-white/10 hover:bg-white/20 rounded-full transition-colors backdrop-blur-sm"
+              aria-label="Close"
+            >
+              <X className="w-6 h-6 text-white" />
+            </button>
+            <motion.div 
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.3 }}
+              className="relative w-full h-full max-w-7xl max-h-[90vh]"
+              onClick={(e) => e.stopPropagation()}
             >
               <Image
-                src={img}
-                alt={`Gallery image ${index + 1}`}
+                src={images[zoomedImage]}
+                alt={`Zoomed image ${zoomedImage + 1}`}
                 fill
-                className="object-cover"
+                className="object-contain"
                 sizes="100vw"
-                priority={true}
-                loading="eager"
+                priority
               />
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
+            </motion.div>
+          </div>
+        </motion.div>
+      )}
+    </>
   );
 };
 
@@ -331,8 +291,8 @@ export default function LuxuryAgencyLanding() {
         </div>
       </section>
 
-      {/* HORIZONTAL SCROLLING IMAGE GALLERY */}
-      <HorizontalScrollGallery images={images} />
+      {/* POLAROID GALLERY */}
+      <PolaroidGallery images={images} />
 
       {/* CTA BANNER */}
       <section className="h-screen flex items-center justify-center bg-muted/30">
