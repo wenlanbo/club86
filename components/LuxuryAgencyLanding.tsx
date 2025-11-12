@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 import { Sparkles, Play, CheckCircle, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 // Simple utility for section titles
 const SectionTitle: React.FC<{ overline?: string; title: string; subtitle?: string }> = ({ overline, title, subtitle }) => (
@@ -163,27 +162,6 @@ export default function LuxuryAgencyLanding() {
               "Full-event production"
             ]}/>
           </div>
-
-          <Accordion type="single" collapsible className="w-full">
-            <AccordionItem value="item-1">
-              <AccordionTrigger>Our production model</AccordionTrigger>
-              <AccordionContent>
-                We streamline cross‑discipline production with modular scopes and transparent pricing—ideal for retained growth or fast campaign turnarounds.
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="item-2">
-              <AccordionTrigger>Measurement & analytics</AccordionTrigger>
-              <AccordionContent>
-                From experiments to MMM, we connect creative to outcomes via live dashboards, eventing, and post‑mortems that inform the next sprint.
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="item-3">
-              <AccordionTrigger>Industries we serve</AccordionTrigger>
-              <AccordionContent>
-                Beauty, fine jewelry, fashion, real estate, hospitality, aviation, and other luxury categories.
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
         </div>
       </section>
 
