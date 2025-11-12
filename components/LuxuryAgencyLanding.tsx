@@ -89,7 +89,7 @@ export default function LuxuryAgencyLanding() {
             <a href="#contact" className="hover:opacity-80">Contact</a>
           </nav>
           <Button asChild size="sm" className="rounded-full">
-            <a href="#contact">Let's Talk <ArrowRight className="ml-1 h-4 w-4"/></a>
+            <a href="#contact">Let&apos;s Talk <ArrowRight className="ml-1 h-4 w-4"/></a>
           </Button>
         </div>
       </header>
@@ -210,7 +210,7 @@ export default function LuxuryAgencyLanding() {
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-14 md:py-20 flex flex-col md:flex-row items-center justify-between gap-6">
           <div>
             <h3 className="text-2xl md:text-3xl font-semibold">Times‑Square‑worthy stories, performance‑grade growth.</h3>
-            <p className="text-muted-foreground mt-2">Tell us your objectives—brand, product, launch, or revenue—and we'll propose a right‑sized plan in 48 hours.</p>
+            <p className="text-muted-foreground mt-2">Tell us your objectives—brand, product, launch, or revenue—and we&apos;ll propose a right‑sized plan in 48 hours.</p>
           </div>
           <Button asChild size="lg" className="rounded-full">
             <a href="#contact">Request proposal</a>
@@ -221,7 +221,7 @@ export default function LuxuryAgencyLanding() {
       {/* CONTACT */}
       <section id="contact" className="border-t">
         <div className="max-w-5xl mx-auto px-4 md:px-6 py-16 md:py-24">
-          <SectionTitle overline="Contact" title="Let's build something exceptional" subtitle="Share a few details and we'll get back quickly."/>
+          <SectionTitle overline="Contact" title="Let&apos;s build something exceptional" subtitle="Share a few details and we&apos;ll get back quickly."/>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card className="md:col-span-2 rounded-2xl">
               <CardContent className="p-6 md:p-8">
