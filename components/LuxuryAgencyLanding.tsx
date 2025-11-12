@@ -131,7 +131,9 @@ export default function LuxuryAgencyLanding() {
       {/* CAPABILITIES */}
       <section id="services" className="border-t">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-24">
-          <SectionTitle overline="Capabilities" title="Strategy, Branding, Content, Digital, PR + Events, Spatial" subtitle="One team across the full funnel—from POV to performance."/>
+          <h2 className="text-3xl md:text-5xl font-semibold leading-tight mb-12 text-left">
+            Our Capabilities
+          </h2>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
             <Capability title="Strategy" items={[
@@ -148,16 +150,17 @@ export default function LuxuryAgencyLanding() {
               "Collateral & Toolkits"
             ]}/>
             <Capability title="Content Creation" items={[
-              "CGI / 3D Motion",
-              "Editorial & Campaign",
-              "E‑com Volume Production",
-              "Directing, Filming, Post"
+              "Social Media Content",
+              "Directing + Filming",
+              "Editing + Post",
+              "Full Production"
             ]}/>
-            <Capability title="Digital Environments" items={[
-              "Web Design & Build",
-              "Shopify / Wordpress",
-              "Responsive & Accessibility",
-              "Email & CRM Templates"
+            <Capability title="Growth + PR" items={[
+              "Celebrity Seeding",
+              "Influencer Partnerships",
+              "Social Media Management",
+              "Strategic Collaborations",
+              "Full-event production"
             ]}/>
           </div>
 
