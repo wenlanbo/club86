@@ -82,42 +82,23 @@ export default function LuxuryAgencyLanding() {
       <header className="sticky top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-background/70 border-b">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 flex items-center justify-between">
           <div className="font-semibold tracking-tight">YourAgency</div>
-          <nav className="hidden md:flex items-center gap-6 text-sm">
-            <a href="#work" className="hover:opacity-80">Work</a>
-            <a href="#services" className="hover:opacity-80">Capabilities</a>
-            <a href="#about" className="hover:opacity-80">About</a>
-            <a href="#contact" className="hover:opacity-80">Contact</a>
-          </nav>
           <Button asChild size="sm" className="rounded-full">
-            <a href="#contact">Let&apos;s Talk <ArrowRight className="ml-1 h-4 w-4"/></a>
+            <a href="mailto:contact@club86.agency">Let&apos;s Talk <ArrowRight className="ml-1 h-4 w-4"/></a>
           </Button>
         </div>
       </header>
 
       {/* HERO */}
-      <section className="relative overflow-hidden">
+      <section className="relative overflow-hidden h-screen flex items-center">
         <div className="absolute inset-0 bg-gradient-to-b from-muted/30 via-transparent to-transparent pointer-events-none"/>
-        <div className="max-w-7xl mx-auto px-4 md:px-6 py-24 md:py-36">
-          <motion.p initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} transition={{delay:0.05}} className="tracking-[0.2em] uppercase text-xs text-muted-foreground">We elevate brands</motion.p>
-          <motion.h1 initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} transition={{delay:0.1}} className="text-4xl md:text-6xl lg:text-7xl font-semibold leading-[1.05] mt-4">
-            Creative + Analytical. <span className="bg-gradient-to-r from-foreground to-foreground/60 bg-clip-text text-transparent">Luxury-forward</span> brand building.
+        <div className="max-w-7xl mx-auto px-4 md:px-6 w-full relative z-10">
+          <motion.h1 initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} transition={{delay:0.1}} className="text-4xl md:text-6xl lg:text-7xl font-semibold leading-[1.05]">
+            We create lasting narratives
           </motion.h1>
-          <motion.p initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} transition={{delay:0.15}} className="mt-6 text-base md:text-lg text-muted-foreground max-w-2xl">
-            A full-service brand marketing & creative studio. We partner as an extension of your team to craft memorable content, transportive experiences, and measurable growth.
-          </motion.p>
-          <div className="mt-8 flex flex-col sm:flex-row gap-3">
-            <Button size="lg" className="rounded-full">Start a project <ArrowRight className="ml-2 h-5 w-5"/></Button>
-            <Button size="lg" variant="outline" className="rounded-full" asChild>
-              <a href="#work">See latest work</a>
-            </Button>
-          </div>
-
-          {/* Marquee / Clients */}
-          <div className="mt-16 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6 opacity-90">
-            {Array.from({ length: 12 }).map((_, i) => (
-              <div key={i} className="h-10 bg-muted rounded-xl grid place-items-center text-xs uppercase tracking-wide text-muted-foreground">Logo</div>
-            ))}
-          </div>
+          <motion.div initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} transition={{delay:0.15}} className="mt-6 text-base md:text-lg text-muted-foreground max-w-2xl space-y-4">
+            <p>We curate moments that move brands forward.</p>
+            <p>An agency specializing in experiential marketing, storytelling, and event curation. We partner with leading brands to design experiences that captivate audiences and shape lasting connections.</p>
+          </motion.div>
         </div>
       </section>
 
