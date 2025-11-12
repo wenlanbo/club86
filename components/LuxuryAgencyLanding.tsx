@@ -68,13 +68,21 @@ const HorizontalScrollGallery: React.FC<{ images: any[] }> = ({ images }) => {
       isLocked = false;
     };
 
-    const updateHorizontalPosition = (progress: number) => {
+    const updateHorizontalPosition = (progress: number, smooth: boolean = true) => {
       if (!scrollContent) return;
       progress = Math.max(0, Math.min(1, progress)); // Clamp 0-1
       const totalWidth = scrollContent.scrollWidth;
       const viewportWidth = window.innerWidth;
       const maxScroll = Math.max(0, totalWidth - viewportWidth);
       const translateX = progress * maxScroll;
+      
+      // Add smooth transition
+      if (smooth) {
+        scrollContent.style.transition = 'transform 0.1s ease-out';
+      } else {
+        scrollContent.style.transition = 'none';
+      }
+      
       scrollContent.style.transform = `translateX(-${translateX}px)`;
     };
 
@@ -136,34 +144,62 @@ const HorizontalScrollGallery: React.FC<{ images: any[] }> = ({ images }) => {
       const isPinned = rect.top <= headerHeight && rect.bottom > headerHeight;
 
       if (isPinned) {
-        // Lock when pinned (unless at boundary)
-        if (!isLocked && scrollProgress > 0.001 && scrollProgress < 0.999) {
-          lockBodyScroll();
+        // Calculate progress based on how much we've scrolled through the container
+        const containerTop = container.offsetTop;
+        const containerHeight = container.offsetHeight;
+        const scrollY = window.scrollY;
+        
+        // Calculate how far we've scrolled into the container
+        // When container top reaches headerHeight, we start at progress 0
+        // When container bottom reaches headerHeight, we end at progress 1
+        const scrollIntoContainer = scrollY - (containerTop - headerHeight);
+        const calculatedProgress = Math.max(0, Math.min(1, scrollIntoContainer / containerHeight));
+        
+        // Update progress when entering pinned state
+        if (!isLocked) {
+          scrollProgress = calculatedProgress;
+          updateHorizontalPosition(scrollProgress, false);
+          
+          // Lock when pinned (unless at boundary)
+          if (scrollProgress > 0.001 && scrollProgress < 0.999) {
+            lockBodyScroll();
+          }
         }
+        // When locked, progress is controlled by wheel events
       } else {
         // Unlock when not pinned
         if (isLocked) {
           unlockBodyScroll();
         }
         // Set initial position
-        if (rect.top > 0) {
+        if (rect.top > headerHeight) {
+          // Before section - show first image
           scrollProgress = 0;
-          updateHorizontalPosition(0);
-        } else if (rect.bottom <= 0) {
+          updateHorizontalPosition(0, false);
+        } else if (rect.bottom <= headerHeight) {
+          // After section - show last image
           scrollProgress = 1;
-          updateHorizontalPosition(1);
+          updateHorizontalPosition(1, false);
         }
       }
     };
 
-    // Set container height based on image height - no extra space
+    // Set container height to allow scrolling through all images
     const updateLayout = () => {
       if (!container || !scrollContent) return;
       const viewportHeight = window.innerHeight;
       const isMobile = window.innerWidth < 768;
       const imageHeight = isMobile ? viewportHeight * 0.85 : viewportHeight * 0.90;
-      // Container height matches image height exactly - no extra space
-      container.style.height = `${imageHeight}px`;
+      
+      // Calculate total horizontal scroll distance
+      const totalWidth = scrollContent.scrollWidth;
+      const viewportWidth = window.innerWidth;
+      const maxHorizontalScroll = Math.max(0, totalWidth - viewportWidth);
+      
+      // Container height should be at least image height, but also enough to scroll through all images
+      // This allows vertical scroll to map to horizontal image scrolling
+      const containerHeight = Math.max(imageHeight, maxHorizontalScroll);
+      container.style.height = `${containerHeight}px`;
     };
 
     // Wait for images to load
@@ -271,6 +307,13 @@ export default function LuxuryAgencyLanding() {
       {/* HORIZONTAL SCROLLING IMAGE GALLERY */}
       <HorizontalScrollGallery images={images} />
 
+      {/* CTA BANNER */}
+      <section className="h-screen flex items-center justify-center bg-muted/30">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 text-center">
+          <h3 className="text-2xl md:text-3xl font-semibold">Make Events Memorable</h3>
+        </div>
+      </section>
+
       {/* VIDEO SECTION */}
       <section id="work" className="h-screen flex items-center justify-center bg-black">
         <div className="w-full h-full relative">
@@ -288,7 +331,7 @@ export default function LuxuryAgencyLanding() {
       </section>
 
       {/* CAPABILITIES */}
-      <section id="services" className="border-t">
+      <section id="services" className="border-t bg-gray-100">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-24">
           <h2 className="text-3xl md:text-5xl font-semibold leading-tight mb-12 text-left">
             Our Capabilities
@@ -322,19 +365,6 @@ export default function LuxuryAgencyLanding() {
               "Full-event production"
             ]}/>
           </div>
-        </div>
-      </section>
-
-      {/* CTA BANNER */}
-      <section className="border-t bg-muted/30">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 py-14 md:py-20 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div>
-            <h3 className="text-2xl md:text-3xl font-semibold">Times‑Square‑worthy stories, performance‑grade growth.</h3>
-            <p className="text-muted-foreground mt-2">Tell us your objectives—brand, product, launch, or revenue—and we&apos;ll propose a right‑sized plan in 48 hours.</p>
-          </div>
-          <Button asChild size="lg" className="rounded-full">
-            <a href="#contact">Request proposal</a>
-          </Button>
         </div>
       </section>
 
