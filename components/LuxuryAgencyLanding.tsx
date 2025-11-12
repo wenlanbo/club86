@@ -146,6 +146,22 @@ const HorizontalScrollGallery: React.FC<{ images: any[] }> = ({ images }) => {
           virtualScroll = 0;
         }
         
+        // Calculate current progress before updating
+        const currentProgress = maxVirtualScroll > 0 ? virtualScroll / maxVirtualScroll : 0;
+        const threshold = 0.01; // Small threshold for boundary detection
+        const isAtStart = currentProgress <= threshold;
+        const isAtEnd = currentProgress >= (1 - threshold);
+        
+        // Check if trying to scroll beyond boundaries
+        const scrollingUp = e.deltaY < 0;
+        const scrollingDown = e.deltaY > 0;
+        
+        // If at start and scrolling up, or at end and scrolling down, unlock and allow normal scroll
+        if ((isAtStart && scrollingUp) || (isAtEnd && scrollingDown)) {
+          unlockScroll();
+          return; // Allow default scroll behavior
+        }
+        
         e.preventDefault();
         virtualScroll += e.deltaY;
         virtualScroll = Math.max(0, Math.min(virtualScroll, maxVirtualScroll));
