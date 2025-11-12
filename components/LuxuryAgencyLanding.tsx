@@ -1,35 +1,22 @@
 "use client"
 
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { Sparkles, Play, CheckCircle, ChevronRight } from "lucide-react";
+import { Sparkles, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Image from "next/image";
 
-// Simple utility for section titles
-const SectionTitle: React.FC<{ overline?: string; title: string; subtitle?: string }> = ({ overline, title, subtitle }) => (
-  <div className="max-w-3xl mx-auto text-center mb-12">
-    {overline && (
-      <p className="tracking-[0.2em] uppercase text-xs text-muted-foreground mb-3">{overline}</p>
-    )}
-    <h2 className="text-3xl md:text-5xl font-semibold leading-tight">
-      {title}
-    </h2>
-    {subtitle && (
-      <p className="text-muted-foreground mt-4 text-base md:text-lg">{subtitle}</p>
-    )}
-  </div>
-);
+// Import images
+import img1 from "@/assets/images/DSC03053.jpg";
+import img2 from "@/assets/images/DSC03141.jpg";
+import img3 from "@/assets/images/DSC03187.jpg";
+import img4 from "@/assets/images/DSC03197.jpg";
+import img5 from "@/assets/images/egirls june 2025-023.jpg";
+import img6 from "@/assets/images/egirls june 2025-059.jpg";
 
-const Stat: React.FC<{ value: string; label: string; blurb?: string }> = ({ value, label, blurb }) => (
-  <Card className="rounded-2xl shadow-sm">
-    <CardContent className="p-6 md:p-8">
-      <div className="text-4xl md:text-5xl font-bold mb-2">{value}</div>
-      <div className="text-sm uppercase tracking-wide text-muted-foreground">{label}</div>
-      {blurb && <p className="text-sm mt-3 text-muted-foreground">{blurb}</p>}
-    </CardContent>
-  </Card>
-);
+const images = [img1, img2, img3, img4, img5, img6];
+
 
 const Capability: React.FC<{title: string; items: string[]}> = ({ title, items }) => (
   <Card className="rounded-2xl">
@@ -46,31 +33,125 @@ const Capability: React.FC<{title: string; items: string[]}> = ({ title, items }
   </Card>
 );
 
-const WorkCard: React.FC<{title: string; tag: string; image?: string}> = ({ title, tag, image }) => (
-  <Card className="group overflow-hidden rounded-2xl border-0 shadow-md bg-muted/10">
-    <div className="aspect-[16/10] w-full bg-gradient-to-br from-muted to-background relative">
-      {/* Placeholder image block */}
-      {image ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={image} alt={title} className="object-cover w-full h-full"/>
-      ) : (
-        <div className="absolute inset-0 grid place-items-center">
-          <Play className="h-12 w-12"/>
+// Horizontal scrolling gallery component
+const HorizontalScrollGallery: React.FC<{ images: any[] }> = ({ images }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    const scrollContent = scrollRef.current;
+    
+    if (!container || !scrollContent) return;
+
+    const handleScroll = () => {
+      const rect = container.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      const containerHeight = rect.height;
+      
+      // Calculate when container enters viewport
+      const containerTop = rect.top;
+      const containerBottom = rect.bottom;
+      
+      // Calculate scroll progress (0 to 1)
+      // Start when container enters viewport, end when it leaves
+      const viewportTop = 0;
+      const viewportBottom = windowHeight;
+      
+      const scrollStart = containerTop <= viewportTop && containerBottom > viewportTop;
+      const scrollEnd = containerTop < viewportBottom && containerBottom <= viewportBottom;
+      
+      let scrollProgress = 0;
+      
+      if (scrollStart && !scrollEnd) {
+        // Container is in viewport, calculate progress
+        const distanceScrolled = viewportTop - containerTop;
+        const totalScrollableDistance = containerHeight - windowHeight;
+        scrollProgress = Math.min(1, Math.max(0, distanceScrolled / totalScrollableDistance));
+      } else if (containerTop > viewportTop) {
+        // Container hasn't entered viewport yet
+        scrollProgress = 0;
+      } else if (containerBottom < viewportBottom) {
+        // Container has left viewport
+        scrollProgress = 1;
+      }
+      
+      // Calculate horizontal scroll distance
+      const maxScroll = scrollContent.scrollWidth - window.innerWidth;
+      const scrollPosition = scrollProgress * maxScroll;
+      
+      scrollContent.style.transform = `translateX(-${scrollPosition}px)`;
+    };
+
+    // Use requestAnimationFrame for smoother scrolling
+    let rafId: number | null = null;
+    const onScroll = () => {
+      if (rafId === null) {
+        rafId = requestAnimationFrame(() => {
+          handleScroll();
+          rafId = null;
+        });
+      }
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    handleScroll(); // Initial call
+
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+      }
+    };
+  }, []);
+
+  return (
+    <section 
+      id="about" 
+      className="border-t h-[200vh] overflow-hidden relative"
+      ref={containerRef}
+    >
+      <div className="sticky top-0 h-screen flex items-center overflow-hidden">
+        <div 
+          className="flex gap-4 md:gap-6 will-change-transform pl-4 md:pl-6"
+          ref={scrollRef}
+          style={{ width: 'max-content' }}
+        >
+          {images.map((img, index) => (
+            <div 
+              key={index} 
+              className="relative w-[85vw] md:w-[70vw] h-[85vh] md:h-[90vh] flex-shrink-0"
+            >
+              <Image
+                src={img}
+                alt={`Gallery image ${index + 1}`}
+                fill
+                className="object-cover rounded-lg"
+                sizes="(max-width: 768px) 85vw, 70vw"
+                priority={index < 2}
+              />
+            </div>
+          ))}
+          {/* Duplicate images for seamless loop */}
+          {images.map((img, index) => (
+            <div 
+              key={`dup-${index}`} 
+              className="relative w-[85vw] md:w-[70vw] h-[85vh] md:h-[90vh] flex-shrink-0"
+            >
+              <Image
+                src={img}
+                alt={`Gallery image ${index + 1} duplicate`}
+                fill
+                className="object-cover rounded-lg"
+                sizes="(max-width: 768px) 85vw, 70vw"
+              />
+            </div>
+          ))}
         </div>
-      )}
-      <motion.div initial={{opacity:0}} whileHover={{opacity:1}} className="absolute inset-0 bg-black/40"/>
-    </div>
-    <CardHeader className="flex flex-row items-center justify-between">
-      <div>
-        <CardTitle className="text-lg">{title}</CardTitle>
-        <p className="text-xs text-muted-foreground mt-1">{tag}</p>
       </div>
-      <Button variant="ghost" className="group-hover:translate-x-1 transition">
-        View <ChevronRight className="ml-1 h-4 w-4"/>
-      </Button>
-    </CardHeader>
-  </Card>
-);
+    </section>
+  );
+};
 
 export default function LuxuryAgencyLanding() {
   return (
@@ -99,31 +180,22 @@ export default function LuxuryAgencyLanding() {
         </div>
       </section>
 
-      {/* STATS */}
-      <section id="about" className="border-t">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-24">
-          <SectionTitle overline="How we work" title="Data-driven creatives, delivering exceptional outcomes." subtitle="We combine rigorous strategy with cinematic craft to unlock desire and conversion."/>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <Stat value="18+" label="Years" blurb="Elevating iconic and emerging brands."/>
-            <Stat value="50%" label="Analytical" blurb="Obsessed with insight, performance, and growth."/>
-            <Stat value="50%" label="Creative" blurb="Art-direction veterans with film-grade craft."/>
-            <Stat value="100%" label="Exceptional" blurb="Experts in excellence, globally."/>
-          </div>
-        </div>
-      </section>
+      {/* HORIZONTAL SCROLLING IMAGE GALLERY */}
+      <HorizontalScrollGallery images={images} />
 
-      {/* LATEST WORK */}
-      <section id="work" className="border-t">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-24">
-          <SectionTitle overline="Latest" title="Recent Work & Case Studies" subtitle="A rotating selection of campaigns, CGI, spatial builds, and product launches."/>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <WorkCard title="Marli New York" tag="CGI • Campaign"/>
-            <WorkCard title="Perrier-Jouët" tag="Experiential • Video"/>
-            <WorkCard title="Converse" tag="Content • Social"/>
-            <WorkCard title="Alexander McQueen" tag="Editorial • Motion"/>
-            <WorkCard title="Covergirl" tag="E‑commerce • Creative"/>
-            <WorkCard title="8 Spruce" tag="Real Estate • Spatial"/>
-          </div>
+      {/* VIDEO SECTION */}
+      <section id="work" className="border-t h-screen flex items-center justify-center bg-black">
+        <div className="w-full h-full relative">
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="w-full h-full object-cover"
+          >
+            <source src="/assets/video/video.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
         </div>
       </section>
 
