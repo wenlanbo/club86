@@ -211,7 +211,7 @@ export default function LuxuryAgencyLanding() {
 
       {/* FOOTER */}
       <footer className="border-t">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-24">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-24 md:py-36">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 mb-12">
             {/* About Us */}
             <div>
@@ -230,7 +230,7 @@ export default function LuxuryAgencyLanding() {
             </div>
             
             {/* Contact Us */}
-            <div>
+            <div className="text-left md:text-right">
               <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
               <div className="text-sm text-muted-foreground">
                 <a href="mailto:contact@club86.agency" className="hover:opacity-80">contact@club86.agency</a>
