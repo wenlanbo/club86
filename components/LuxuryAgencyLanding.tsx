@@ -81,7 +81,7 @@ export default function LuxuryAgencyLanding() {
       {/* NAV */}
       <header className="sticky top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-background/70 border-b">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 flex items-center justify-between">
-          <div className="font-semibold tracking-tight">YourAgency</div>
+          <div className="font-semibold tracking-tight">Club86</div>
           <Button asChild size="sm" className="rounded-full">
             <a href="mailto:contact@club86.agency">Let&apos;s Talk <ArrowRight className="ml-1 h-4 w-4"/></a>
           </Button>
@@ -91,11 +91,11 @@ export default function LuxuryAgencyLanding() {
       {/* HERO */}
       <section className="relative overflow-hidden h-screen flex items-center">
         <div className="absolute inset-0 bg-gradient-to-b from-muted/30 via-transparent to-transparent pointer-events-none"/>
-        <div className="max-w-7xl mx-auto px-4 md:px-6 w-full relative z-10">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 w-full relative z-10 text-center">
           <motion.h1 initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} transition={{delay:0.1}} className="text-4xl md:text-6xl lg:text-7xl font-semibold leading-[1.05]">
             We create lasting narratives
           </motion.h1>
-          <motion.div initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} transition={{delay:0.15}} className="mt-6 text-base md:text-lg text-muted-foreground max-w-2xl space-y-4">
+          <motion.div initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} transition={{delay:0.15}} className="mt-6 text-base md:text-lg text-muted-foreground max-w-2xl mx-auto space-y-4">
             <p>We curate moments that move brands forward.</p>
             <p>An agency specializing in experiential marketing, storytelling, and event curation. We partner with leading brands to design experiences that captivate audiences and shape lasting connections.</p>
           </motion.div>
