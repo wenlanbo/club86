@@ -124,6 +124,19 @@ const HorizontalScrollGallery: React.FC<{ images: any[] }> = ({ images }) => {
 
     window.addEventListener('resize', handleResize);
 
+    const getCurrentProgress = (): number => {
+      if (!scrollContent) return 0;
+      const totalWidth = scrollContent.scrollWidth;
+      const viewportWidth = window.innerWidth;
+      const maxScroll = Math.max(0, totalWidth - viewportWidth);
+      if (maxScroll === 0) return 0;
+      
+      const currentTransform = scrollContent.style.transform;
+      const match = currentTransform.match(/translateX\(-(\d+(?:\.\d+)?)px\)/);
+      const currentHorizontalPos = match ? parseFloat(match[1]) : 0;
+      return currentHorizontalPos / maxScroll;
+    };
+
     const updateHorizontalPosition = (progress: number) => {
       if (!scrollContent) return;
       const totalWidth = scrollContent.scrollWidth;
@@ -139,29 +152,29 @@ const HorizontalScrollGallery: React.FC<{ images: any[] }> = ({ images }) => {
       const rect = container.getBoundingClientRect();
       const isPinned = rect.top <= 0 && rect.bottom > 0;
 
-      if (isPinned) {
-        // Lock scroll if not already locked
-        if (!isLocked) {
-          lockScroll();
-          virtualScroll = 0;
-        }
-        
+      if (isPinned && isLocked) {
         // Calculate current progress before updating
         const currentProgress = maxVirtualScroll > 0 ? virtualScroll / maxVirtualScroll : 0;
-        const threshold = 0.01; // Small threshold for boundary detection
-        const isAtStart = currentProgress <= threshold;
-        const isAtEnd = currentProgress >= (1 - threshold);
+        const isAtStart = currentProgress <= 0.001; // At start (0%)
+        const isAtEnd = currentProgress >= 0.999; // At end (100%)
         
-        // Check if trying to scroll beyond boundaries
+        // Check scroll direction
         const scrollingUp = e.deltaY < 0;
         const scrollingDown = e.deltaY > 0;
         
-        // If at start and scrolling up, or at end and scrolling down, unlock and allow normal scroll
-        if ((isAtStart && scrollingUp) || (isAtEnd && scrollingDown)) {
+        // If at start and trying to scroll up, unlock to allow scrolling up
+        if (isAtStart && scrollingUp) {
           unlockScroll();
           return; // Allow default scroll behavior
         }
         
+        // If at end and trying to scroll down, unlock to allow scrolling down
+        if (isAtEnd && scrollingDown) {
+          unlockScroll();
+          return; // Allow default scroll behavior
+        }
+        
+        // Otherwise, prevent default and update horizontal scroll
         e.preventDefault();
         virtualScroll += e.deltaY;
         virtualScroll = Math.max(0, Math.min(virtualScroll, maxVirtualScroll));
@@ -169,6 +182,25 @@ const HorizontalScrollGallery: React.FC<{ images: any[] }> = ({ images }) => {
         // Calculate progress based on virtual scroll
         const progress = maxVirtualScroll > 0 ? virtualScroll / maxVirtualScroll : 0;
         updateHorizontalPosition(progress);
+        
+        // Check if we've hit a boundary after updating
+        const newProgress = maxVirtualScroll > 0 ? virtualScroll / maxVirtualScroll : 0;
+        const nowAtStart = newProgress <= 0.001;
+        const nowAtEnd = newProgress >= 0.999;
+        
+        // If we hit a boundary and are trying to continue in that direction, unlock
+        if ((nowAtStart && scrollingUp) || (nowAtEnd && scrollingDown)) {
+          unlockScroll();
+        }
+      } else if (isPinned && !isLocked) {
+        // Lock scroll when entering pinned state
+        // Calculate virtual scroll based on current horizontal position
+        const currentProgress = getCurrentProgress();
+        
+        lockScroll();
+        // Set virtual scroll to match current position
+        virtualScroll = currentProgress * maxVirtualScroll;
+        e.preventDefault();
       }
     };
 
@@ -184,10 +216,19 @@ const HorizontalScrollGallery: React.FC<{ images: any[] }> = ({ images }) => {
       const isPinned = containerTop <= 0 && containerBottom > 0;
 
       if (isPinned) {
-        // Lock vertical scroll when section is pinned
-        if (!isLocked) {
+        // Check if we're at a boundary - if so, don't lock
+        const currentProgress = maxVirtualScroll > 0 ? virtualScroll / maxVirtualScroll : 0;
+        const isAtStart = currentProgress <= 0.001;
+        const isAtEnd = currentProgress >= 0.999;
+        
+        // Only lock if not at a boundary
+        if (!isLocked && !isAtStart && !isAtEnd) {
+          // Calculate virtual scroll based on current horizontal position
+          const progress = getCurrentProgress();
+          
           lockScroll();
-          virtualScroll = 0; // Reset virtual scroll when entering pinned state
+          // Set virtual scroll to match current position
+          virtualScroll = progress * maxVirtualScroll;
         }
       } else {
         // Unlock vertical scroll when section is not pinned
