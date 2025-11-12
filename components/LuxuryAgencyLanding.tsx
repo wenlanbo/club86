@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useEffect, useRef } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, CheckCircle, ZoomIn, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -52,8 +52,8 @@ const PolaroidGallery: React.FC<{ images: any[] }> = ({ images }) => {
       // Calculate center of container
       const centerX = containerWidth / 2;
       const centerY = containerHeight / 2;
-      // Scatter radius (increased to 60% of container size for more scatter)
-      const scatterRadius = Math.min(containerWidth, containerHeight) * 0.6;
+      // Scatter radius (increased to 80% of container size for much more scatter)
+      const scatterRadius = Math.min(containerWidth, containerHeight) * 0.8;
       // Gadget size (30% bigger: 280*1.3=364, 320*1.3=416)
       const gadgetWidth = 416;
       const gadgetHeight = 480;
@@ -264,44 +264,48 @@ const PolaroidGallery: React.FC<{ images: any[] }> = ({ images }) => {
       </section>
 
       {/* Full-screen zoom modal */}
-      {zoomedImage !== null && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center cursor-pointer"
-          onClick={handleCloseZoom}
-        >
-          <div className="relative w-full h-full flex items-center justify-center p-4">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleCloseZoom();
-              }}
-              className="absolute top-4 right-4 z-10 p-3 bg-white/10 hover:bg-white/20 rounded-full transition-colors backdrop-blur-sm"
-              aria-label="Close"
-            >
-              <X className="w-6 h-6 text-white" />
-            </button>
-            <motion.div 
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.3 }}
-              className="relative w-full h-full max-w-7xl max-h-[90vh]"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <Image
-                src={images[zoomedImage]}
-                alt={`Zoomed image ${zoomedImage + 1}`}
-                fill
-                className="object-contain"
-                sizes="100vw"
-                priority
-              />
-            </motion.div>
-          </div>
-        </motion.div>
-      )}
+      <AnimatePresence>
+        {zoomedImage !== null && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center cursor-pointer"
+            onClick={handleCloseZoom}
+          >
+            <div className="relative w-full h-full flex items-center justify-center p-4">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleCloseZoom();
+                }}
+                className="absolute top-4 right-4 z-10 p-3 bg-white/10 hover:bg-white/20 rounded-full transition-colors backdrop-blur-sm"
+                aria-label="Close"
+              >
+                <X className="w-6 h-6 text-white" />
+              </button>
+              <motion.div 
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="relative w-full h-full max-w-7xl max-h-[90vh]"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Image
+                  src={images[zoomedImage]}
+                  alt={`Zoomed image ${zoomedImage + 1}`}
+                  fill
+                  className="object-contain"
+                  sizes="100vw"
+                  priority
+                />
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 };
