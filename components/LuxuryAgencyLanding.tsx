@@ -200,8 +200,8 @@ export default function LuxuryAgencyLanding() {
       </section>
 
       {/* CONTACT */}
-      <section id="contact" className="border-t">
-        <div className="max-w-5xl mx-auto px-4 md:px-6 py-16 md:py-24 text-center">
+      <section id="contact" className="border-t h-screen flex items-center">
+        <div className="max-w-5xl mx-auto px-4 md:px-6 w-full text-center relative z-10">
           <h2 className="text-3xl md:text-5xl font-semibold leading-tight mb-8">
             Let&apos;s create moments that leave a mark
           </h2>
