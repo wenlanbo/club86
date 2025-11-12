@@ -2,11 +2,9 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Sparkles, Play, Mail, Phone, MapPin, CheckCircle, ChevronRight } from "lucide-react";
+import { Sparkles, Play, CheckCircle, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 // Simple utility for section titles
@@ -83,7 +81,7 @@ export default function LuxuryAgencyLanding() {
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 flex items-center justify-between">
           <div className="font-semibold tracking-tight">Club86</div>
           <Button asChild size="sm" className="rounded-full">
-            <a href="mailto:contact@club86.agency">Let&apos;s Talk <ArrowRight className="ml-1 h-4 w-4"/></a>
+            <a href="mailto:contact@club86.agency">Let&apos;s Talk</a>
           </Button>
         </div>
       </header>
@@ -206,7 +204,7 @@ export default function LuxuryAgencyLanding() {
             Let&apos;s create moments that leave a mark
           </h2>
           <Button asChild size="lg" className="rounded-full">
-            <a href="mailto:contact@club86.agency">Let&apos;s Talk <ArrowRight className="ml-2 h-5 w-5"/></a>
+            <a href="mailto:contact@club86.agency">Let&apos;s Talk</a>
           </Button>
         </div>
       </section>
