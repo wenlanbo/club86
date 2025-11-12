@@ -33,57 +33,120 @@ const Capability: React.FC<{title: string; items: string[]}> = ({ title, items }
   </Card>
 );
 
-// Horizontal scrolling gallery component
+// Horizontal scrolling gallery component with scroll locking
 const HorizontalScrollGallery: React.FC<{ images: any[] }> = ({ images }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const scrollContentRef = useRef<HTMLDivElement>(null);
+  const stickyStartY = useRef<number | null>(null);
 
   useEffect(() => {
     const container = containerRef.current;
-    const scrollContent = scrollRef.current;
+    const scrollContent = scrollContentRef.current;
     
     if (!container || !scrollContent) return;
 
-    const handleScroll = () => {
-      const rect = container.getBoundingClientRect();
-      const windowHeight = window.innerHeight;
-      const containerHeight = rect.height;
+    const updateLayout = () => {
+      // Calculate the total width needed to scroll through all images
+      const totalWidth = scrollContent.scrollWidth;
+      const viewportWidth = window.innerWidth;
+      const maxHorizontalScroll = Math.max(0, totalWidth - viewportWidth);
       
-      // Calculate when container enters viewport
-      const containerTop = rect.top;
-      const containerBottom = rect.bottom;
-      
-      // Calculate scroll progress (0 to 1)
-      // Start when container enters viewport, end when it leaves
-      const viewportTop = 0;
-      const viewportBottom = windowHeight;
-      
-      const scrollStart = containerTop <= viewportTop && containerBottom > viewportTop;
-      const scrollEnd = containerTop < viewportBottom && containerBottom <= viewportBottom;
-      
-      let scrollProgress = 0;
-      
-      if (scrollStart && !scrollEnd) {
-        // Container is in viewport, calculate progress
-        const distanceScrolled = viewportTop - containerTop;
-        const totalScrollableDistance = containerHeight - windowHeight;
-        scrollProgress = Math.min(1, Math.max(0, distanceScrolled / totalScrollableDistance));
-      } else if (containerTop > viewportTop) {
-        // Container hasn't entered viewport yet
-        scrollProgress = 0;
-      } else if (containerBottom < viewportBottom) {
-        // Container has left viewport
-        scrollProgress = 1;
-      }
-      
-      // Calculate horizontal scroll distance
-      const maxScroll = scrollContent.scrollWidth - window.innerWidth;
-      const scrollPosition = scrollProgress * maxScroll;
-      
-      scrollContent.style.transform = `translateX(-${scrollPosition}px)`;
+      // Set container height to allow scrolling through all images
+      // The height determines how much vertical scroll is needed to go through all images horizontally
+      // This creates the "locked" effect - scroll down to scroll images horizontally
+      // Make sure the height is sufficient to scroll through all images
+      const containerHeight = Math.max(maxHorizontalScroll * 1.2, viewportWidth * 2);
+      container.style.height = `${containerHeight}px`;
     };
 
-    // Use requestAnimationFrame for smoother scrolling
+    // Wait for images to load
+    const updateAfterImagesLoad = () => {
+      const images = scrollContent.querySelectorAll('img');
+      let loadedCount = 0;
+      const totalImages = images.length;
+
+      if (totalImages === 0) {
+        updateLayout();
+        return;
+      }
+
+      const checkAllLoaded = () => {
+        loadedCount++;
+        if (loadedCount === totalImages) {
+          updateLayout();
+        }
+      };
+
+      images.forEach((img: HTMLImageElement) => {
+        if (img.complete) {
+          checkAllLoaded();
+        } else {
+          img.addEventListener('load', checkAllLoaded);
+          img.addEventListener('error', checkAllLoaded);
+        }
+      });
+    };
+
+    updateAfterImagesLoad();
+    updateLayout(); // Initial calculation
+
+    const handleResize = () => {
+      stickyStartY.current = null;
+      updateLayout();
+    };
+
+    window.addEventListener('resize', handleResize);
+
+      const handleScroll = () => {
+      if (!container || !scrollContent) return;
+
+      const rect = container.getBoundingClientRect();
+      const containerTop = rect.top;
+      const containerBottom = rect.bottom;
+      const scrollY = window.scrollY;
+      const containerHeight = container.offsetHeight;
+      const containerOffsetTop = container.offsetTop;
+
+      // Check if we're in the pinned section (sticky at top)
+      const isPinned = containerTop <= 0 && containerBottom > 0;
+
+      if (isPinned) {
+        // Track when sticky starts - record container bottom position
+        if (stickyStartY.current === null) {
+          stickyStartY.current = containerBottom;
+        }
+
+        // Calculate progress based on how much of the container has scrolled past
+        // When sticky starts, containerBottom is at its maximum (containerHeight)
+        // As we scroll, containerBottom decreases to 0
+        // Progress = 1 - (containerBottom / initialContainerBottom)
+        const initialBottom = stickyStartY.current || containerHeight;
+        const progress = Math.min(1, Math.max(0, 1 - (containerBottom / initialBottom)));
+
+        // Calculate horizontal scroll position
+        const totalWidth = scrollContent.scrollWidth;
+        const viewportWidth = window.innerWidth;
+        const maxScroll = Math.max(0, totalWidth - viewportWidth);
+        const horizontalPosition = progress * maxScroll;
+
+        scrollContent.style.transform = `translateX(-${horizontalPosition}px)`;
+      } else {
+        // Reset when not pinned
+        stickyStartY.current = null;
+        
+        if (containerTop > 0) {
+          // Before section - show first image
+          scrollContent.style.transform = 'translateX(0)';
+        } else if (containerBottom <= 0) {
+          // After section - show last image
+          const totalWidth = scrollContent.scrollWidth;
+          const viewportWidth = window.innerWidth;
+          const maxScroll = Math.max(0, totalWidth - viewportWidth);
+          scrollContent.style.transform = `translateX(-${maxScroll}px)`;
+        }
+      }
+    };
+
     let rafId: number | null = null;
     const onScroll = () => {
       if (rafId === null) {
@@ -99,22 +162,23 @@ const HorizontalScrollGallery: React.FC<{ images: any[] }> = ({ images }) => {
 
     return () => {
       window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', handleResize);
       if (rafId !== null) {
         cancelAnimationFrame(rafId);
       }
     };
-  }, []);
+  }, [images.length]);
 
   return (
     <section 
       id="about" 
-      className="border-t h-[200vh] overflow-hidden relative"
+      className="overflow-hidden relative"
       ref={containerRef}
     >
-      <div className="sticky top-0 h-screen flex items-center overflow-hidden">
+      <div className="sticky top-0 h-screen flex items-center overflow-hidden bg-background">
         <div 
           className="flex gap-4 md:gap-6 will-change-transform pl-4 md:pl-6"
-          ref={scrollRef}
+          ref={scrollContentRef}
           style={{ width: 'max-content' }}
         >
           {images.map((img, index) => (
@@ -129,21 +193,6 @@ const HorizontalScrollGallery: React.FC<{ images: any[] }> = ({ images }) => {
                 className="object-cover rounded-lg"
                 sizes="(max-width: 768px) 85vw, 70vw"
                 priority={index < 2}
-              />
-            </div>
-          ))}
-          {/* Duplicate images for seamless loop */}
-          {images.map((img, index) => (
-            <div 
-              key={`dup-${index}`} 
-              className="relative w-[85vw] md:w-[70vw] h-[85vh] md:h-[90vh] flex-shrink-0"
-            >
-              <Image
-                src={img}
-                alt={`Gallery image ${index + 1} duplicate`}
-                fill
-                className="object-cover rounded-lg"
-                sizes="(max-width: 768px) 85vw, 70vw"
               />
             </div>
           ))}
@@ -184,7 +233,7 @@ export default function LuxuryAgencyLanding() {
       <HorizontalScrollGallery images={images} />
 
       {/* VIDEO SECTION */}
-      <section id="work" className="border-t h-screen flex items-center justify-center bg-black">
+      <section id="work" className="h-screen flex items-center justify-center bg-black">
         <div className="w-full h-full relative">
           <video
             autoPlay
