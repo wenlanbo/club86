@@ -416,9 +416,6 @@ export default function LuxuryAgencyLanding() {
           <h2 className="text-3xl md:text-5xl font-semibold leading-tight mb-8">
             Let&apos;s create moments that leave a mark
           </h2>
-          <Button asChild size="lg" className="bg-transparent hover:bg-transparent text-black border-0 shadow-none text-2xl md:text-3xl font-semibold">
-            <a href="mailto:contact@club86.agency">Let&apos;s Talk</a>
-          </Button>
         </div>
       </section>
 
