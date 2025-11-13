@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, CheckCircle, ZoomIn, X } from "lucide-react";
+import { ZoomIn, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
@@ -23,12 +23,12 @@ const images = [img1, img2, img3, img4, img5, img6, img7, img8];
 const Capability: React.FC<{title: string; items: string[]}> = ({ title, items }) => (
   <Card className="rounded-2xl">
     <CardHeader className="pb-3">
-      <CardTitle className="text-xl flex items-center gap-2"><Sparkles className="h-5 w-5"/>{title}</CardTitle>
+      <CardTitle className="text-xl">{title}</CardTitle>
     </CardHeader>
     <CardContent>
       <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
         {items.map((x, i) => (
-          <li key={i} className="flex items-start gap-2 text-sm"><CheckCircle className="h-4 w-4 mt-0.5"/> {x}</li>
+          <li key={i} className="text-sm">{x}</li>
         ))}
       </ul>
     </CardContent>
