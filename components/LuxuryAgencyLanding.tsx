@@ -54,18 +54,17 @@ const PolaroidGallery: React.FC<{ images: any[] }> = ({ images }) => {
       // Calculate center of container
       const centerX = containerWidth / 2;
       const centerY = containerHeight / 2;
-      // Scatter radius (increased to 80% of container size for much more scatter)
-      const scatterRadius = Math.min(containerWidth, containerHeight) * 0.8;
+      // Scatter radius - more horizontal, less vertical
+      const scatterRadiusX = containerWidth * 0.9; // 90% of width for horizontal scatter
+      const scatterRadiusY = containerHeight * 0.4; // 40% of height for vertical scatter
       // Gadget size (30% bigger: 280*1.3=364, 320*1.3=416)
       const gadgetWidth = 416;
       const gadgetHeight = 480;
       
       const initialPositions = images.map(() => {
-        // Random angle and distance from center
-        const angle = Math.random() * Math.PI * 2;
-        const distance = Math.random() * scatterRadius;
-        const offsetX = Math.cos(angle) * distance;
-        const offsetY = Math.sin(angle) * distance;
+        // More horizontal spread, less vertical spread
+        const offsetX = (Math.random() - 0.5) * scatterRadiusX;
+        const offsetY = (Math.random() - 0.5) * scatterRadiusY;
         
         // Random rotation between -15 and +15 degrees
         const randomRotation = (Math.random() - 0.5) * 30;
