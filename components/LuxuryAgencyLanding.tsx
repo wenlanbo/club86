@@ -317,7 +317,7 @@ export default function LuxuryAgencyLanding() {
       {/* NAV */}
       <header className="sticky top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-background/70 border-b">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 flex items-center justify-between">
-          <div className="font-semibold tracking-tight">Club86</div>
+          <div className="font-normal tracking-tight">Club86</div>
           <Button asChild size="sm" className="bg-transparent hover:bg-transparent text-black border-0 shadow-none">
             <a href="mailto:contact@club86.agency">Let&apos;s Talk</a>
           </Button>
@@ -345,7 +345,7 @@ export default function LuxuryAgencyLanding() {
               initial={{opacity:0, y:10}} 
               animate={{opacity:1, y:0}} 
               transition={{delay:0.1}} 
-              className="text-4xl md:text-6xl lg:text-7xl font-semibold leading-[1.05] text-white"
+              className="text-4xl md:text-6xl lg:text-7xl font-normal leading-[1.05] text-white"
             >
               We create lasting narratives
             </motion.h1>
@@ -365,7 +365,7 @@ export default function LuxuryAgencyLanding() {
       {/* CTA BANNER */}
       <section className="h-screen flex items-center justify-center bg-muted/30">
         <div className="max-w-7xl mx-auto px-4 md:px-6 text-center">
-          <h3 className="text-2xl md:text-3xl font-semibold">Make Events Memorable</h3>
+          <h3 className="text-2xl md:text-3xl font-normal">Make Events Memorable</h3>
         </div>
       </section>
 
@@ -375,7 +375,7 @@ export default function LuxuryAgencyLanding() {
       {/* CAPABILITIES */}
       <section id="services" className="border-t bg-gray-100">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-24">
-          <h2 className="text-3xl md:text-5xl font-semibold leading-tight mb-12 text-left">
+          <h2 className="text-3xl md:text-5xl font-normal leading-tight mb-12 text-left">
             Our Capabilities
           </h2>
 
@@ -413,7 +413,7 @@ export default function LuxuryAgencyLanding() {
       {/* CONTACT */}
       <section id="contact" className="border-t h-screen flex items-center">
         <div className="max-w-5xl mx-auto px-4 md:px-6 w-full text-center relative z-10">
-          <h2 className="text-3xl md:text-5xl font-semibold leading-tight mb-8">
+          <h2 className="text-3xl md:text-5xl font-normal leading-tight mb-8">
             Let&apos;s create moments that leave a mark
           </h2>
         </div>
@@ -425,7 +425,7 @@ export default function LuxuryAgencyLanding() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 mb-12">
             {/* About Us */}
             <div>
-              <h3 className="text-lg font-semibold mb-4">About Us</h3>
+              <h3 className="text-lg font-normal mb-4">About Us</h3>
               <div className="text-sm text-muted-foreground space-y-4">
                 <p>
                   Club86 is a creative agency building cultural moments for the crypto industry. We specialize in event production, storytelling, and brand strategy for leading projects, exchanges, and communities across web3.
@@ -441,7 +441,7 @@ export default function LuxuryAgencyLanding() {
             
             {/* Contact Us */}
             <div className="text-left md:text-right">
-              <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
+              <h3 className="text-lg font-normal mb-4">Contact Us</h3>
               <div className="text-sm text-muted-foreground">
                 <a href="mailto:contact@club86.agency" className="hover:opacity-80">contact@club86.agency</a>
               </div>
