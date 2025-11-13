@@ -14,8 +14,10 @@ import img3 from "@/assets/images/DSC03187.jpg";
 import img4 from "@/assets/images/DSC03197.jpg";
 import img5 from "@/assets/images/egirls june 2025-023.jpg";
 import img6 from "@/assets/images/egirls june 2025-059.jpg";
+import img7 from "@/assets/images/photo_2025-11-12_21-33-06.jpg";
+import img8 from "@/assets/images/photo_2025-11-12_21-33-45.jpg";
 
-const images = [img1, img2, img3, img4, img5, img6];
+const images = [img1, img2, img3, img4, img5, img6, img7, img8];
 
 
 const Capability: React.FC<{title: string; items: string[]}> = ({ title, items }) => (
@@ -337,16 +339,6 @@ export default function LuxuryAgencyLanding() {
         </div>
       </section>
 
-      {/* POLAROID GALLERY */}
-      <PolaroidGallery images={images} />
-
-      {/* CTA BANNER */}
-      <section className="h-screen flex items-center justify-center bg-muted/30">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 text-center">
-          <h3 className="text-2xl md:text-3xl font-semibold">Make Events Memorable</h3>
-        </div>
-      </section>
-
       {/* VIDEO SECTION */}
       <section id="work" className="h-screen flex items-center justify-center bg-black">
         <div className="w-full h-full relative">
@@ -362,6 +354,16 @@ export default function LuxuryAgencyLanding() {
           </video>
         </div>
       </section>
+
+      {/* CTA BANNER */}
+      <section className="h-screen flex items-center justify-center bg-muted/30">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 text-center">
+          <h3 className="text-2xl md:text-3xl font-semibold">Make Events Memorable</h3>
+        </div>
+      </section>
+
+      {/* POLAROID GALLERY */}
+      <PolaroidGallery images={images} />
 
       {/* CAPABILITIES */}
       <section id="services" className="border-t bg-gray-100">
