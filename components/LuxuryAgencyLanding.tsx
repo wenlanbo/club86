@@ -318,29 +318,15 @@ export default function LuxuryAgencyLanding() {
       <header className="sticky top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-background/70 border-b">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 flex items-center justify-between">
           <div className="font-semibold tracking-tight">Club86</div>
-          <Button asChild size="sm" className="rounded-full">
+          <Button asChild size="sm" className="rounded-full bg-transparent hover:bg-transparent text-black border border-black/20 hover:border-black/40">
             <a href="mailto:contact@club86.agency">Let&apos;s Talk</a>
           </Button>
         </div>
       </header>
 
-      {/* HERO */}
-      <section className="relative overflow-hidden h-screen flex items-center">
-        <div className="absolute inset-0 bg-gradient-to-b from-muted/30 via-transparent to-transparent pointer-events-none"/>
-        <div className="max-w-7xl mx-auto px-4 md:px-6 w-full relative z-10 text-center">
-          <motion.h1 initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} transition={{delay:0.1}} className="text-4xl md:text-6xl lg:text-7xl font-semibold leading-[1.05]">
-            We create lasting narratives
-          </motion.h1>
-          <motion.div initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} transition={{delay:0.15}} className="mt-6 text-base md:text-lg text-muted-foreground max-w-2xl mx-auto space-y-4">
-            <p>We curate moments that move brands forward.</p>
-            <p>An agency specializing in experiential marketing, storytelling, and event curation. We partner with leading brands to design experiences that captivate audiences and shape lasting connections.</p>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* VIDEO SECTION */}
-      <section id="work" className="h-screen flex items-center justify-center bg-black">
-        <div className="w-full h-full relative">
+      {/* VIDEO SECTION WITH TEXT OVERLAY - FIRST SECTION */}
+      <section id="work" className="relative h-screen flex items-center justify-center bg-black overflow-hidden">
+        <div className="absolute inset-0 w-full h-full">
           <video
             autoPlay
             muted
@@ -351,6 +337,28 @@ export default function LuxuryAgencyLanding() {
             <source src="/assets/video/video.mp4" type="video/mp4" />
             Your browser does not support the video tag.
           </video>
+        </div>
+        {/* Text Overlay */}
+        <div className="absolute inset-0 flex items-center justify-center z-10">
+          <div className="max-w-7xl mx-auto px-4 md:px-6 w-full text-center">
+            <motion.h1 
+              initial={{opacity:0, y:10}} 
+              animate={{opacity:1, y:0}} 
+              transition={{delay:0.1}} 
+              className="text-4xl md:text-6xl lg:text-7xl font-semibold leading-[1.05] text-white"
+            >
+              We create lasting narratives
+            </motion.h1>
+            <motion.div 
+              initial={{opacity:0, y:10}} 
+              animate={{opacity:1, y:0}} 
+              transition={{delay:0.15}} 
+              className="mt-6 text-base md:text-lg text-white/90 max-w-2xl mx-auto space-y-4"
+            >
+              <p>We curate moments that move brands forward.</p>
+              <p>An agency specializing in experiential marketing, storytelling, and event curation. We partner with leading brands to design experiences that captivate audiences and shape lasting connections.</p>
+            </motion.div>
+          </div>
         </div>
       </section>
 
@@ -408,7 +416,7 @@ export default function LuxuryAgencyLanding() {
           <h2 className="text-3xl md:text-5xl font-semibold leading-tight mb-8">
             Let&apos;s create moments that leave a mark
           </h2>
-          <Button asChild size="lg" className="rounded-full">
+          <Button asChild size="lg" className="rounded-full bg-transparent hover:bg-transparent text-black border border-black/20 hover:border-black/40">
             <a href="mailto:contact@club86.agency">Let&apos;s Talk</a>
           </Button>
         </div>

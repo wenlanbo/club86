@@ -19,8 +19,8 @@ const config = {
     },
     extend: {
       fontFamily: {
-        'lemon-milk': ['Lemon Milk', 'sans-serif'],
-        sans: ['Lemon Milk', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        'helvetica-neue': ['Helvetica Neue', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        sans: ['Helvetica Neue', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
