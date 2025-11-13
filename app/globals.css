@@ -88,10 +88,10 @@
   }
   body {
     @apply bg-background text-foreground;
-    cursor: url('/icon.svg') 16 16, auto;
+    cursor: url('/icon.svg') 15 15, auto;
   }
   a, button, [role="button"], [onclick] {
-    cursor: url('/icon.svg') 16 16, pointer;
+    cursor: url('/icon.svg') 15 15, pointer;
   }
 }
 
