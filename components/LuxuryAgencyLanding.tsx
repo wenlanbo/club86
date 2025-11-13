@@ -318,7 +318,7 @@ export default function LuxuryAgencyLanding() {
       <header className="sticky top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-background/70 border-b">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 flex items-center justify-between">
           <div className="font-semibold tracking-tight">Club86</div>
-          <Button asChild size="sm" className="rounded-full bg-transparent hover:bg-transparent text-black border border-black/20 hover:border-black/40">
+          <Button asChild size="sm" className="bg-transparent hover:bg-transparent text-black border-0 shadow-none">
             <a href="mailto:contact@club86.agency">Let&apos;s Talk</a>
           </Button>
         </div>
@@ -416,7 +416,7 @@ export default function LuxuryAgencyLanding() {
           <h2 className="text-3xl md:text-5xl font-semibold leading-tight mb-8">
             Let&apos;s create moments that leave a mark
           </h2>
-          <Button asChild size="lg" className="rounded-full bg-transparent hover:bg-transparent text-black border border-black/20 hover:border-black/40">
+          <Button asChild size="lg" className="bg-transparent hover:bg-transparent text-black border-0 shadow-none">
             <a href="mailto:contact@club86.agency">Let&apos;s Talk</a>
           </Button>
         </div>
