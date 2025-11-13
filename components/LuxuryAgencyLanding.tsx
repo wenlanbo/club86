@@ -23,12 +23,12 @@ const images = [img1, img2, img3, img4, img5, img6, img7, img8];
 const Capability: React.FC<{title: string; items: string[]}> = ({ title, items }) => (
   <Card className="rounded-2xl">
     <CardHeader className="pb-3">
-      <CardTitle className="text-xl">{title}</CardTitle>
+      <CardTitle className="text-xl font-thin">{title}</CardTitle>
     </CardHeader>
     <CardContent>
       <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
         {items.map((x, i) => (
-          <li key={i} className="text-sm">{x}</li>
+          <li key={i} className="text-sm font-thin">{x}</li>
         ))}
       </ul>
     </CardContent>
@@ -207,7 +207,11 @@ const PolaroidGallery: React.FC<{ images: any[] }> = ({ images }) => {
         className="relative min-h-screen bg-black py-20"
         ref={containerRef}
       >
-        <div className="relative w-full h-full" style={{ minHeight: '100vh' }}>
+        {/* Background text */}
+        <div className="absolute inset-0 flex items-center justify-center z-0 pointer-events-none">
+          <h3 className="text-6xl md:text-8xl lg:text-9xl font-thin text-white/10">Make Events Memorable</h3>
+        </div>
+        <div className="relative w-full h-full z-10" style={{ minHeight: '100vh' }}>
           {images.map((img, index) => {
             const position = positions[index] || { x: 0, y: 0, rotation: 0 };
             return (
@@ -359,13 +363,6 @@ export default function LuxuryAgencyLanding() {
               <p>An agency specializing in experiential marketing, storytelling, and event curation. We partner with leading brands to design experiences that captivate audiences and shape lasting connections.</p>
             </motion.div>
           </div>
-        </div>
-      </section>
-
-      {/* CTA BANNER */}
-      <section className="h-screen flex items-center justify-center bg-muted/30">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 text-center">
-          <h3 className="text-3xl md:text-5xl font-thin">Make Events Memorable</h3>
         </div>
       </section>
 
