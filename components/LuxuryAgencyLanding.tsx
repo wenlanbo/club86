@@ -207,7 +207,7 @@ const PolaroidGallery: React.FC<{ images: any[] }> = ({ images }) => {
       >
         {/* Background text */}
         <div className="absolute inset-0 flex items-center justify-center z-0 pointer-events-none">
-          <h3 className="text-6xl md:text-8xl lg:text-9xl font-thin text-white/10">Make Events Memorable</h3>
+          <h3 className="text-3xl md:text-4xl lg:text-5xl font-thin text-white">Make Events Memorable</h3>
         </div>
         <div className="relative w-full h-full z-10" style={{ minHeight: '100vh' }}>
           {images.map((img, index) => {
@@ -401,6 +401,9 @@ export default function LuxuryAgencyLanding() {
         </div>
       </section>
 
+      {/* POLAROID GALLERY */}
+      <PolaroidGallery images={images} />
+
       {/* FOOTER */}
       <footer className="border-t">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-24 md:py-36">
@@ -451,9 +454,6 @@ export default function LuxuryAgencyLanding() {
           </div>
         </div>
       </footer>
-
-      {/* POLAROID GALLERY */}
-      <PolaroidGallery images={images} />
     </div>
   );
 }
