@@ -416,10 +416,13 @@ export default function LuxuryAgencyLanding() {
                   Club86 is a creative agency building cultural moments for the crypto industry. We specialize in event production, storytelling, and brand strategy for leading projects, exchanges, and communities across web3.
                 </p>
                 <p>
+                  With access to private members' clubs across New York—including well-known destinations and under-the-radar creative spaces for designers, founders, and influential voices—we create experiences that feel both exclusive and deeply connected to the culture.
+                </p>
+                <p>
                   From large-scale conferences and private gatherings to curated brand activations, we connect people, products, and ideas through immersive experiences. Our team blends marketing strategy with cultural insight to help brands stand out, scale authentically, and create lasting impact both online and IRL.
                 </p>
                 <p>
-                  At Club86, we turn crypto into culture, one event, one story, and one connection at a time
+                  At Club86, we turn crypto into culture, one event, one story, and one connection at a time.
                 </p>
               </div>
             </div>
