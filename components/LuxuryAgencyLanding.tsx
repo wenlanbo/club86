@@ -14,21 +14,19 @@ import img3 from "@/assets/images/DSC03187.jpg";
 import img4 from "@/assets/images/DSC03197.jpg";
 import img5 from "@/assets/images/egirls june 2025-023.jpg";
 import img6 from "@/assets/images/egirls june 2025-059.jpg";
-import img7 from "@/assets/images/photo_2025-11-12_21-33-06.jpg";
-import img8 from "@/assets/images/photo_2025-11-12_21-33-45.jpg";
 
-const images = [img1, img2, img3, img4, img5, img6, img7, img8];
+const images = [img1, img2, img3, img4, img5, img6];
 
 
 const Capability: React.FC<{title: string; items: string[]}> = ({ title, items }) => (
   <Card className="rounded-2xl">
     <CardHeader className="pb-3">
-      <CardTitle className="text-xl font-thin">{title}</CardTitle>
+      <CardTitle className="text-xl font-light">{title}</CardTitle>
     </CardHeader>
     <CardContent>
       <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
         {items.map((x, i) => (
-          <li key={i} className="text-sm font-thin">{x}</li>
+          <li key={i} className="text-sm font-light">{x}</li>
         ))}
       </ul>
     </CardContent>
@@ -359,15 +357,11 @@ export default function LuxuryAgencyLanding() {
               transition={{delay:0.15}} 
               className="mt-6 text-base md:text-lg text-white/90 max-w-2xl mx-auto space-y-4"
             >
-              <p>We curate moments that move brands forward.</p>
               <p>An agency specializing in experiential marketing, storytelling, and event curation. We partner with leading brands to design experiences that captivate audiences and shape lasting connections.</p>
             </motion.div>
           </div>
         </div>
       </section>
-
-      {/* POLAROID GALLERY */}
-      <PolaroidGallery images={images} />
 
       {/* CAPABILITIES */}
       <section id="services" className="border-t bg-gray-100">
@@ -404,15 +398,6 @@ export default function LuxuryAgencyLanding() {
               "Full-event production"
             ]}/>
           </div>
-        </div>
-      </section>
-
-      {/* CONTACT */}
-      <section id="contact" className="border-t h-screen flex items-center">
-        <div className="max-w-5xl mx-auto px-4 md:px-6 w-full text-center relative z-10">
-          <h2 className="text-3xl md:text-5xl font-thin leading-tight mb-8">
-            Let&apos;s create moments that leave a mark
-          </h2>
         </div>
       </section>
 
@@ -466,6 +451,9 @@ export default function LuxuryAgencyLanding() {
           </div>
         </div>
       </footer>
+
+      {/* POLAROID GALLERY */}
+      <PolaroidGallery images={images} />
     </div>
   );
 }
